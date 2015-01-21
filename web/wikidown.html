@@ -3,7 +3,7 @@
 <meta charset="utf-8" />
   <link rel="icon" href="favicon.ico">
   <link href="css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/default.min.css">
+  <link rel="stylesheet" href="css/highlight.default.min.css">
   <link href="main.css" rel="stylesheet">
 </head>
 <body onload="init()">
@@ -16,7 +16,7 @@
           <span class="icon-bar"></span>
         </button>
         <div class="navbar-header">
-          <a class="navbar-brand" href="#main" style="color:#C0C0C0">
+          <a class="navbar-brand" href="#main:home" style="color:#C0C0C0">
 		    <span class="glyphicon glyphicon-home"></span> &nbsp;
 		    <span id="title">home</span>
 	      </a>
@@ -26,7 +26,7 @@
             <div class="form-group">
 	      <button class="btn btn-success" type="button" onclick="show()">預覽</button>
               <button class="btn btn-success" type="button" onclick="edit()">編輯</button>
-              <input id="filename" type="text" class="form-control" placeholder="filename" aria-describedby="basic-addon1" value="main">
+              <input id="filepath" type="text" class="form-control" placeholder="filepath" aria-describedby="basic-addon1" value="main:home">
 	      <button class="btn btn-success" type="button" onclick="load()">載入</button>
               <button class="btn btn-success" type="button" onclick="saveFile()">儲存</button>
 			</div>
@@ -47,17 +47,24 @@
 
     <script src="js/jquery.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
-    <script src="js/Showdown.min.js"></script>
-    <script src="js/Showdown_table.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
+    <script src="js/Showdown/Showdown.min.js"></script>
+    <script src="js/Showdown/extensions/table.min.js"></script>
+    <script src="js/highlight.min.js"></script>
+<!--	<script src="js/MathJax/MathJax.js?config=TeX-AMS-MML_SVG"></script> -->
 	<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_SVG"></script>
 <script>
-DB = { db:"md" };
+// var domain = "main";
+function path() {
+  var tokens = filepath.split(':');
+  return { domain:tokens[0], file:tokens[1] };
+}
 
-DB.save=function(name, doc) {
+DB = {};
+
+DB.save=function(domain, file, doc) {
   $.ajax({
     type: "POST",
-    url: "/db/"+DB.db+"/"+name,
+    url: "/db/"+domain+"/"+file,
 	timeout:2000,
     data: { obj: doc },
   })
@@ -69,34 +76,35 @@ DB.save=function(name, doc) {
   });
 }
 
-DB.load=function(name) {
+DB.load=function(domain, file) {
   return $.ajax({
     type: "GET",
-    url: "./"+DB.db+"/"+name,
+    url: "./db/"+domain+"/md/"+file,
 	timeout:2000,
     data: {}
   });
 }
 
-var filename, converter, title;
+var filepath, converter, title;
 
 function init() {
   converter = new Showdown.converter({ extensions: ['table'] });
   if (window.location.hash === '')
-    filename = $('#filename').val();
+    filepath = $('#filepath').val();
   else
-    filename = window.location.hash.substring(1);
-  DB.load("title").done(function(title) {
+    filepath = window.location.hash.substring(1);
+  
+  DB.load(path().domain, "title").done(function(title) {
     $('#title').html(title);
   });
-  $('#filename').keypress(function(e) {
+  $('#filepath').keypress(function(e) {
   if (e.which == '13') {
      e.preventDefault();
-     filename = $('#filename').val();
-     loadFile(filename);
+     filepath = $('#filepath').val();
+     loadFile(filepath);
    }
   });
-  loadFile(filename);
+  loadFile(filepath);
 }
 
 function switchPanel(name) {
@@ -106,10 +114,10 @@ function switchPanel(name) {
 
 function mdToHtml(md) {
   md  = "\n"+md+"\n"; 
-  md  = md.replace(/(\s)\!\[\[([^\]]+?)\]\]\((.*?)\)(\s)/gmi, '$1<div class="figure"><img src="img/$3"/><p class="caption">$2</p></div>$4'); // 內部圖片 ![[text]](file)
-  md  = md.replace(/(\s)\[\[([^\]]+?)\]\]\((.*?)\)(\s)/gi, '$1<a href="#$3" class="innerLink">$2</a>$4'); // 內部連結 [[text]](file)
-  md  = md.replace(/(\s)\[\[([^\]]+?)\]\](\s)/gi, '$1<a href="#$2" class="innerLink">$2</a>$3'); // 內部連結 [[file]]
-  md  = md.replace(/(\s)\$\$([^$]+?)\$\$(\s)/gi, '$1<script type="math/tex">$2</'+'script>$3');// 數學式 $$[latex]$$
+  md  = md.replace(/(\s)\!\[\[([^\]]+?)\]\]\((.*?)\)/gi, '$1<div class="figure"><img src="db/'+path().domain+'/img/$3"/><p class="caption">$2</p></div>'); // 內部圖片 ![[text]](file)
+  md  = md.replace(/(\s)\[\[([^\]]+?)\]\]\((.*?)\)/gi, '$1<a href="#'+path().domain+':$3" class="innerLink">$2</a>'); // 內部連結 [[text]](file)
+  md  = md.replace(/(\s)\[\[([^\]]+?)\]\]/gi, '$1<a href="#'+path().domain+':$2" class="innerLink">$2</a>'); // 內部連結 [[file]]
+  md  = md.replace(/(\s)\$\$([^$]+?)\$\$/gi, '$1<script type="math/tex">$2</'+'script>');// 數學式 $$[latex]$$
   return converter.makeHtml(md);
 }
 
@@ -131,16 +139,16 @@ function show() {
 }
 
 function load() {
-  filename = $('#filename').val();
-  loadFile(filename);
+  filepath = $('#filepath').val();
+  loadFile(filepath);
 }
 
-function loadFile(filename) {
-  if (filename === null || filename === '')
+function loadFile(filepath) {
+  if (filepath === null || filepath === '')
     return;
-  $('#filename').val(filename);
-  window.location.hash = '#'+filename;
-  DB.load(filename)
+  $('#filepath').val(filepath);
+  window.location.hash = '#'+filepath;
+  DB.load(path().domain, path().file)
   .done(function(md) {
     $('#mdBox').val(md);
     show();
@@ -153,12 +161,12 @@ function loadFile(filename) {
 
 function saveFile() {
   var md = $('#mdBox').val();
-  DB.save(filename, md);
+  DB.save(path().domain, path().file, md);
 }
 
 window.onhashchange = function () {
-  filename = window.location.hash.substring(1);
-  loadFile(filename);
+  filepath = window.location.hash.substring(1);
+  loadFile(filepath);
 }
 
 window.onbeforeunload = function(){}

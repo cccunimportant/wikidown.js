@@ -9,7 +9,7 @@ var serveIndex = require('serve-index');
 
 var app = express();
 var webDir = path.join(__dirname, 'web');
-var dbDir = webDir;
+var dbRoot = path.join(webDir, 'db');
 
 app.use(cookieParser());
 app.use(session({secret: '@#$TYHaadfa1', resave: false, saveUninitialized: true}));
@@ -26,16 +26,18 @@ app.get("/", function(req, res) {
   res.redirect('/web/wikidown.html');
 });
 
+/*
 app.get("/db/:db/:name", function(req, res) {
   var db = req.params.db;
   var name = req.params.name;
-  fs.readFile(dbDir+'/'+db+'/'+name, function(err, jtext) {
+  fs.readFile(dbRoot+'/'+db+'/'+name, function(err, jtext) {
     if (err)
       response(res, 404, 'read fail!');
     else
       response(res, 200, jtext.toString());
   });
 });
+*/
 
 app.post("/db/:db/:name", function(req, res) {
   var db = req.params.db;
@@ -43,7 +45,7 @@ app.post("/db/:db/:name", function(req, res) {
   var obj = req.body.obj;
   var msg = "db:"+db+" name:"+name+"\n"+obj;
   c.log(msg);
-  fs.writeFile(dbDir+"/"+db+"/"+name, obj, function(err) {
+  fs.writeFile(dbRoot+"/"+db+"/md/"+name, obj, function(err) {
     if (err)
       response(res, 500, 'write fail!');
     else
