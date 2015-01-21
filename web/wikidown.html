@@ -1,0 +1,167 @@
+<html>
+<head>
+<meta charset="utf-8" />
+  <link rel="icon" href="favicon.ico">
+  <link href="css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/default.min.css">
+  <link href="main.css" rel="stylesheet">
+</head>
+<body onload="init()">
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <div class="navbar-header">
+          <a class="navbar-brand" href="#main" style="color:#C0C0C0">
+		    <span class="glyphicon glyphicon-home"></span> &nbsp;
+		    <span id="title">home</span>
+	      </a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <form class="navbar-form navbar-right">
+            <div class="form-group">
+	      <button class="btn btn-success" type="button" onclick="show()">預覽</button>
+              <button class="btn btn-success" type="button" onclick="edit()">編輯</button>
+              <input id="filename" type="text" class="form-control" placeholder="filename" aria-describedby="basic-addon1" value="main">
+	      <button class="btn btn-success" type="button" onclick="load()">載入</button>
+              <button class="btn btn-success" type="button" onclick="saveFile()">儲存</button>
+			</div>
+          </form>
+        </div>
+      </div>
+    </nav>
+
+    <div id="showPanel" class="tab-pane panel">
+      <div id="htmlBox" class="container"></div>
+    </div>
+    <center>
+      <div id="editPanel" class="tab-pane panel" style="width:90%; height:90%;">
+        <br/>
+        <textarea id="mdBox" class="form-control" style="width:100%; height:100%"></textarea>
+      </div>
+    </center>
+
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/Showdown.min.js"></script>
+    <script src="js/Showdown_table.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
+	<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_SVG"></script>
+<script>
+DB = { db:"md" };
+
+DB.save=function(name, doc) {
+  $.ajax({
+    type: "POST",
+    url: "/db/"+DB.db+"/"+name,
+	timeout:2000,
+    data: { obj: doc },
+  })
+  .done(function(data) {
+    alert( "存檔完成!");
+  })
+  .fail(function() {
+    alert( "存檔失敗！" );
+  });
+}
+
+DB.load=function(name) {
+  return $.ajax({
+    type: "GET",
+    url: "./"+DB.db+"/"+name,
+	timeout:2000,
+    data: {}
+  });
+}
+
+var filename, converter, title;
+
+function init() {
+  converter = new Showdown.converter({ extensions: ['table'] });
+  if (window.location.hash === '')
+    filename = $('#filename').val();
+  else
+    filename = window.location.hash.substring(1);
+  DB.load("title").done(function(title) {
+    $('#title').html(title);
+  });
+  $('#filename').keypress(function(e) {
+  if (e.which == '13') {
+     e.preventDefault();
+     filename = $('#filename').val();
+     loadFile(filename);
+   }
+  });
+  loadFile(filename);
+}
+
+function switchPanel(name) {
+  $('.panel').css( "display", "none");
+  $('#'+name).css( "display", "block");
+}
+
+function mdToHtml(md) {
+  md  = "\n"+md+"\n"; 
+  md  = md.replace(/(\s)\!\[\[([^\]]+?)\]\]\((.*?)\)(\s)/gmi, '$1<div class="figure"><img src="img/$3"/><p class="caption">$2</p></div>$4'); // 內部圖片 ![[text]](file)
+  md  = md.replace(/(\s)\[\[([^\]]+?)\]\]\((.*?)\)(\s)/gi, '$1<a href="#$3" class="innerLink">$2</a>$4'); // 內部連結 [[text]](file)
+  md  = md.replace(/(\s)\[\[([^\]]+?)\]\](\s)/gi, '$1<a href="#$2" class="innerLink">$2</a>$3'); // 內部連結 [[file]]
+  md  = md.replace(/(\s)\$\$([^$]+?)\$\$(\s)/gi, '$1<script type="math/tex">$2</'+'script>$3');// 數學式 $$[latex]$$
+  return converter.makeHtml(md);
+}
+
+var mdNewFile = '# 標題：文件不存在\n\n您可以編輯後存檔！\n## 語法\n* [[內部連結]](innerLink)\n* [外部連結](link)';
+
+function edit() {
+  switchPanel('editPanel');
+}
+
+function show() {
+  var md = $('#mdBox').val();
+  var html = mdToHtml(md);
+  $('#htmlBox').html(html);
+  $('pre code').each(function(i, block) {
+    hljs.highlightBlock(block);
+  });
+  switchPanel('showPanel');
+  MathJax.Hub.Queue(["Typeset",MathJax.Hub, "htmlBox"]);
+}
+
+function load() {
+  filename = $('#filename').val();
+  loadFile(filename);
+}
+
+function loadFile(filename) {
+  if (filename === null || filename === '')
+    return;
+  $('#filename').val(filename);
+  window.location.hash = '#'+filename;
+  DB.load(filename)
+  .done(function(md) {
+    $('#mdBox').val(md);
+    show();
+  })
+  .fail(function() {
+    $('#mdBox').val(mdNewFile);
+    show();
+  });
+}
+
+function saveFile() {
+  var md = $('#mdBox').val();
+  DB.save(filename, md);
+}
+
+window.onhashchange = function () {
+  filename = window.location.hash.substring(1);
+  loadFile(filename);
+}
+
+window.onbeforeunload = function(){}
+</script>
+</body>
+</html>

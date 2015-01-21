@@ -1,0 +1,7 @@
+{
+  "name": "wikidown1 posted to heroku",
+  "description": "Wikidown = wiki+markdown",
+  "repository": "https://github.com/ccckmit/wikidown1",
+  "logo": "http://node-js-sample.herokuapp.com/node.svg",
+  "keywords": ["wiki", "markdown", "blog"]
+}
