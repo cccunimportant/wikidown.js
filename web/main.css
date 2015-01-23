@@ -1,6 +1,4 @@
-.innerLink {
-  color:#3333FF;
-}
+.innerLink { color:#996633; }
 
 ruby {
   ruby-align: center;
@@ -407,6 +405,6 @@ code > span.er { color: #ff0000; font-weight: bold; }
 }
 
 body {
-  padding-top: 50px;
+  padding-top: 60px;
 }
 

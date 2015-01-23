@@ -1,0 +1,18 @@
+# 關於 wikidown 系統
+
+----
+[[wikidown]] 是一個使用 [markdown] 語法編輯的 [維基] （ wiki） 系統，採用 [node.js] 作為伺服器，但程式可以離線執行。
+
+在離線執行時， [[wikidown]] 會將資料暫存在瀏覽器的 [localstorage](http://zh.wikipedia.org/wiki/%E7%BD%91%E9%A1%B5%E5%AD%98%E5%82%A8) 儲存空間中，一旦連上伺服器之後，資料就會被寫回伺服器以檔案的形式保存。
+
+於是您在連線或離線的情況下都可以使用 [[wikidown]] 系統，如果您安裝了 [node.js]，也可以輕易的將 [[wikidown]]  架設在自己的電腦中執行，這樣就可以將編輯的檔案立刻儲存在自己的電腦中了。
+
+----
+
+作者： [[陳鍾誠]](ccckmit)
+
+本專案原始碼位於：<https://github.com/ccckmit/wikidown.js>
+
+[markdown]:http://markdown.tw/
+[維基]:http://zh.wikipedia.org/wiki/%E7%B6%AD%E5%9F%BA
+[node.js]:http://nodejs.org/

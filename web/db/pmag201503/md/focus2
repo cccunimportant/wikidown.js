@@ -1,3 +1,14 @@
+## Wikidown 的原始碼解析
+
+wikidown 的原始碼主要包含兩個檔案，一個是前端的 wikidown.html ，另一個是後端的 wikiServer.js 。
+
+前端的 wikidown.html 負責建構使用者介面，並透過 jQuery 的 ajax 遠端呼叫載入或儲存您編輯的 markdown 檔案，而後端的 wikiServer.js 則單純負責 markdown 檔案的讀取與寫入動作，並傳回讀取的內容給前端的 wikidown.html。
+
+以下就讓我們來看看 wikidown 前後兩端程式的原始碼吧！
+
+### 前端網頁：wikidown.html
+
+```
 <html>
 <head>
 <meta charset="utf-8" />
@@ -24,17 +35,6 @@
 	      </a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
-<!--		
-		  <ul class="nav navbar-nav navbar-right">
-            <li class="dropdown">
-              <a class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-globe"></span><span class="caret"></span></a>
-              <ul class="dropdown-menu" role="menu">
-                <li><a onclick="Mt.switchLang('us')">English</a></li>
-                <li><a onclick="Mt.switchLang('tw')">中文</a></li>
-              </ul>
-            </li>
-		  </ul>
--->		  
           <form class="navbar-form navbar-right">
             <div class="form-group">
 	      <button class="btn btn-success" type="button" onclick="show()">預覽</button>
@@ -64,10 +64,8 @@
     <script src="js/Showdown/extensions/table.min.js"></script>
     <script src="js/highlight.min.js"></script>
     <script src="config.js"></script>
-<!--	<script src="js/MathJax/MathJax.js?config=TeX-AMS-MML_SVG"></script> -->
 	<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_SVG"></script>
 <script>
-// var domain = "main";
 function path() {
   var tokens = filepath.split(':');
   return { domain:tokens[0], file:tokens[1] };
@@ -130,7 +128,7 @@ function mdToHtml(md) {
   md  = md.replace(/(\s)\[\[([^\]]+?)\]\]\((.*?)\)/gi, '$1<a href="#'+path().domain+':$3" class="innerLink">$2</a>'); // 內部連結 [[text]](file)
   md  = md.replace(/(\s)\[\[([^\]:]+):([^\]:]+)\]\]/gi, '$1<a href="#$2:$3" class="innerLink">$2:$3</a>'); // 內部連結 [[file]]
   md  = md.replace(/(\s)\[\[([^\]:]+?)\]\]/gi, '$1<a href="#'+path().domain+':$2" class="innerLink">$2</a>'); // 內部連結 [[file]]
-  md  = md.replace(/(\s)\$\$([^$]+?)\$\$/gi, '$1<script type="math/tex">$2</'+'script>');// 數學式 $$[latex]$$  
+  md  = md.replace(/(\s)\$\$([^$]+?)\$\$/gi, '$1<script type="math/tex">$2</'+'script>');// 數學式 
   return converter.makeHtml(md);
 }
 
@@ -187,3 +185,68 @@ window.onbeforeunload = function(){}
 </script>
 </body>
 </html>
+```
+
+### 後端伺服器：wikiServer.js
+
+```javascript
+
+var c = console;
+var fs = require('fs');
+var express = require('express');
+var path = require('path');
+var bodyParser = require("body-parser"); // 參考：http://codeforgeek.com/2014/09/handle-get-post-request-express-4/
+var cookieParser = require('cookie-parser')
+var session = require('express-session');
+var serveIndex = require('serve-index');
+
+var app = express();
+var webDir = path.join(__dirname, 'web');
+var dbRoot = path.join(webDir, 'db');
+
+app.use(cookieParser());
+app.use(session({secret: '@#$TYHaadfa1', resave: false, saveUninitialized: true}));
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use('/web/', express.static(webDir));
+app.use('/web/', serveIndex(webDir, {'icons': true}));
+
+function response(res, code, msg) {
+  res.set('Content-Length', ''+msg.length).set('Content-Type', 'text/plain').status(code).send(msg).end();
+  c.log("response: code="+code+"\n");
+}
+
+app.get("/", function(req, res) {
+  res.redirect('/web/wikidown.html');
+});
+
+app.post("/db/:db/:name", function(req, res) {
+  var db = req.params.db;
+  var name = req.params.name;
+  var obj = req.body.obj;
+  var msg = "db:"+db+" name:"+name+"\n"+obj;
+  c.log(msg);
+  fs.writeFile(dbRoot+"/"+db+"/md/"+name, obj, function(err) {
+    if (err)
+      response(res, 500, 'write fail!');
+    else
+      response(res, 200, 'write success!');
+  })
+});
+
+var port = process.env.PORT || 3000; // process.env.PORT for Heroku
+app.listen(port);
+
+console.log('Server started: http://localhost:'+port);
+
+```
+
+### 結語
+
+以上的 wikidown 系統設計方式，盡可能的將功能放在前端的單一網頁上，而後端則只是用來『儲存或取出資料』而已，筆者覺得這種方法非常的簡潔，不需要像很多 node.js 系統採用了很多 jade, ejs 等樣板所建構的網頁，將功能重點放在後端，然後不停的轉換頁，讓系統變得較為複雜且龐大。
+
+當然、有一得必有一失，將前端功能全放在單一網頁中，就比較難以分工進行，因此在團隊合作上會比較困難。
+
+不過、對於筆者這樣一個人包辦整個系統的『獨立開發者』而言，這種方式似乎是比較方便且敏捷的阿！
+
+
+

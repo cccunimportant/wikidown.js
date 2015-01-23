@@ -18,23 +18,10 @@
         <div class="navbar-header">
           <a class="navbar-brand" href="#main:home" style="color:#C0C0C0">
 		    <span class="glyphicon glyphicon-home"></span> &nbsp;
-	      </a>
-          <a id="titlelink" class="navbar-brand" href="#wikidown:home" style="color:#C0C0C0">
-			<span id="title">Wikidown</span> 
+		    <span id="title">home</span>
 	      </a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
-<!--		
-		  <ul class="nav navbar-nav navbar-right">
-            <li class="dropdown">
-              <a class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-globe"></span><span class="caret"></span></a>
-              <ul class="dropdown-menu" role="menu">
-                <li><a onclick="Mt.switchLang('us')">English</a></li>
-                <li><a onclick="Mt.switchLang('tw')">中文</a></li>
-              </ul>
-            </li>
-		  </ul>
--->		  
           <form class="navbar-form navbar-right">
             <div class="form-group">
 	      <button class="btn btn-success" type="button" onclick="show()">預覽</button>
@@ -63,7 +50,6 @@
     <script src="js/Showdown/Showdown.min.js"></script>
     <script src="js/Showdown/extensions/table.min.js"></script>
     <script src="js/highlight.min.js"></script>
-    <script src="config.js"></script>
 <!--	<script src="js/MathJax/MathJax.js?config=TeX-AMS-MML_SVG"></script> -->
 	<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_SVG"></script>
 <script>
@@ -99,7 +85,7 @@ DB.load=function(domain, file) {
   });
 }
 
-var filepath, converter;
+var filepath, converter, title;
 
 function init() {
   converter = new Showdown.converter({ extensions: ['table'] });
@@ -107,7 +93,10 @@ function init() {
     filepath = $('#filepath').val();
   else
     filepath = window.location.hash.substring(1);
-
+  
+  DB.load(path().domain, "title").done(function(title) {
+    $('#title').html(title);
+  });
   $('#filepath').keypress(function(e) {
   if (e.which == '13') {
      e.preventDefault();
@@ -124,13 +113,11 @@ function switchPanel(name) {
 }
 
 function mdToHtml(md) {
-  md  = "\n"+md+"\n"+config.append+"\n"; 
-  md  = md.replace(/(\s)\!\[\[([^\]]*?)\]\]\((.*?)\)/gi, '$1<div class="figure"><img src="db/'+path().domain+'/img/$3"/><p class="caption">$2</p></div>'); // 內部圖片 ![[text]](file)
-  md  = md.replace(/(\s)\[\[([^\]]+?)\]\]\(([^:\)]+):([^:\)]+)\)/gi, '$1<a href="#$3:$4" class="innerLink">$2</a>'); // 內部連結 [[text]](file)
+  md  = "\n"+md+"\n"; 
+  md  = md.replace(/(\s)\!\[\[([^\]]+?)\]\]\((.*?)\)/gi, '$1<div class="figure"><img src="db/'+path().domain+'/img/$3"/><p class="caption">$2</p></div>'); // 內部圖片 ![[text]](file)
   md  = md.replace(/(\s)\[\[([^\]]+?)\]\]\((.*?)\)/gi, '$1<a href="#'+path().domain+':$3" class="innerLink">$2</a>'); // 內部連結 [[text]](file)
-  md  = md.replace(/(\s)\[\[([^\]:]+):([^\]:]+)\]\]/gi, '$1<a href="#$2:$3" class="innerLink">$2:$3</a>'); // 內部連結 [[file]]
-  md  = md.replace(/(\s)\[\[([^\]:]+?)\]\]/gi, '$1<a href="#'+path().domain+':$2" class="innerLink">$2</a>'); // 內部連結 [[file]]
-  md  = md.replace(/(\s)\$\$([^$]+?)\$\$/gi, '$1<script type="math/tex">$2</'+'script>');// 數學式 $$[latex]$$  
+  md  = md.replace(/(\s)\[\[([^\]]+?)\]\]/gi, '$1<a href="#'+path().domain+':$2" class="innerLink">$2</a>'); // 內部連結 [[file]]
+  md  = md.replace(/(\s)\$\$([^$]+?)\$\$/gi, '$1<script type="math/tex">$2</'+'script>');// 數學式 $$[latex]$$
   return converter.makeHtml(md);
 }
 
@@ -160,7 +147,6 @@ function loadFile(filepath) {
   if (filepath === null || filepath === '')
     return;
   $('#filepath').val(filepath);
-  var domain = path().domain;
   window.location.hash = '#'+filepath;
   DB.load(path().domain, path().file)
   .done(function(md) {
