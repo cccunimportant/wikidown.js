@@ -212,7 +212,7 @@ function show() {
     hljs.highlightBlock(block);
   });
   switchPanel('panelShow');
-  if (MathJax !== undefined)
+  if (typeof(MathJax) !== 'undefined')
     MathJax.Hub.Queue(["Typeset",MathJax.Hub, "htmlBox"]);
   $('#modeMenu').html('預覽');
 }
