@@ -228,7 +228,6 @@ function show() {
     MathJax.Hub.Queue(["Typeset",MathJax.Hub, "htmlBox"]);
   $('#modeMenu').html('預覽');
   showTitle();
-  //$;
 }
 
 function load() {
@@ -273,7 +272,16 @@ function saveFile() {
 }
 
 // create/modify share button
-  function sharebutton() {$("#footersharediv").text(window.location.origin + '/web/db/' + path().domain + '/link/' + path().file + '.html');}
+  function sharebutton() {
+    var c = 'web';
+    var currenpath = window.location;
+    $("#footersharediv").text('' +
+      currenpath.origin +
+      currenpath.pathname.split(c)[0] + c
+      + '/db/' + path().domain +
+      '/link/' + path().file +
+      '.html');
+  }
   $(window).load(function() {
     sharebutton();
   });
