@@ -74,9 +74,10 @@ app.post("/db/:db/:name", function(req, res) {
     <meta property="og:type" content="article" />\n\
   </head>\n\
   <body>\n\
-    <script>window.location.replace("/web/wikidown.html#' + db + ':' + name + '");</script>\n\
+    <script>window.location.replace("/wikidown.js/web/wikidown.html#' + db + ':' + name + '");</script>\n\
   </body>\n\
 </html>';
+  // Note: only for particular project like -> wikidown.js
   fs.writeFile(dbRoot+"/"+db+"/link/"+name+".html", ogstr, function(e) {
     if (e) response(res, 500, "test fail!");
     else response(res, 200, "test success^_^");
