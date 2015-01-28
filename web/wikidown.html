@@ -5,6 +5,7 @@
   <link href="css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="css/highlight.default.min.css">
   <link href="main.css" rel="stylesheet">
+  <title>Wikidown</title>
 </head>
 <body onload="init()">
     <nav class="navbar navbar-inverse navbar-fixed-top">
@@ -21,7 +22,7 @@
 	      </a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
-          <div id="title" class="navbar-header" style="color:#C0C0C0"></div>
+          <div id="titleHead" class="navbar-header" style="color:#C0C0C0"></div>
 		  <ul class="nav navbar-nav navbar-right">
             <li class="dropdown">
               <a class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-globe"></span><span class="caret"></span></a>
@@ -215,6 +216,7 @@ function show() {
   if (typeof(MathJax) !== 'undefined')
     MathJax.Hub.Queue(["Typeset",MathJax.Hub, "htmlBox"]);
   $('#modeMenu').html('預覽');
+  showTitle();
 }
 
 function load() {
@@ -222,18 +224,25 @@ function load() {
   loadFile(filepath);
 }
 
-function showTitle(domain) {
-  var titleNow = title['wikidown'];
+function showTitleHead(domain) {
+  var titleHead = title['wikidown'];
   if (title[domain] !== undefined)
-    titleNow = title[domain];
-  $('#title').html(titleNow);
+    titleHead = title[domain];
+  $('#titleHead').html(titleHead);
+}
+
+function showTitle() {
+    if ($('h1').length > 0)
+      $('title').html($('#titleHead').text()+' -- '+$('h1')[0].innerText);
+    else if ($('h2').length>0)
+      $('title').html($('#titleHead').text()+' -- '+$('h2')[0].innerText);
 }
 
 function loadFile(filepath) {
   if (filepath === null || filepath === '')
     return;
   $('#filepath').val(filepath);
-  showTitle(path().domain);
+  showTitleHead(path().domain);
   window.location.hash = '#'+filepath;
   Server.load(path().domain, path().file)
   .done(function(md) {
