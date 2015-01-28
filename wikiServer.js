@@ -53,9 +53,35 @@ app.post("/db/:db/:name", function(req, res) {
   fs.writeFile(dbRoot+"/"+db+"/md/"+name, obj, function(err) {
     if (err)
       response(res, 500, 'write fail!');
-    else
-      response(res, 200, 'write success!');
+    //else
+    //  response(res, 200, 'write success!');
   })
+  c.log("alright, there is need a response.");
+  c.log("again, try to write a file with some meta which can be parsed by FB graph api.");
+  //var metafs = require('fs');
+  var ogTitle = obj.split('\n')[0].split('# ')[1];
+  c.log("===DEBUG===");
+  c.log(ogTitle);
+  c.log("===DEBUG===");
+  var ogstr = '\
+<html>\n\
+  <head>\n\
+    <meta charset="utf-8" />\n\
+    <link rel="icon" href="favicon.ico">\n\
+    <meta property="description" />\n\
+    <meta property="og:site_name" content="wikidown" />\n\
+    <meta property="og:title" content="' + ogTitle + '" />\n\
+    <meta property="og:type" content="article" />\n\
+  </head>\n\
+  <body>\n\
+    <script>window.location.replace("/web/wikidown.html#' + db + ':' + name + '");</script>\n\
+  </body>\n\
+</html>';
+  fs.writeFile(dbRoot+"/"+db+"/link/"+name+".html", ogstr, function(e) {
+    if (e) response(res, 500, "test fail!");
+    else response(res, 200, "test success^_^");
+  })
+  //response(res, 200, 'write success!');
 });
 
 app.post("/login", function(req, res) {
