@@ -1,0 +1,14 @@
+---
+title: 程式人雜誌, 少年科技人雜誌
+- type: main
+  text: My Book
+- type: subtitle
+  text: 2015年2月號
+creator:
+- role: editor
+  text: 陳鍾誠
+identifier:
+- scheme: DOI
+  text: doi:10.234234.234/33
+publisher:  web
+rights: CC BY-SA
