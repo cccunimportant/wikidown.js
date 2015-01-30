@@ -17,7 +17,7 @@
           <span class="icon-bar"></span>
         </button>
         <div class="navbar-header" style="color:#C0C0C0">
-          <a class="navbar-brand" href="#main:home">
+          <a id="navbar-brand-id" class="navbar-brand" href="#main:home">
 		    <span class="glyphicon glyphicon-home"></span> &nbsp;
 	      </a>
         </div>
@@ -70,6 +70,16 @@
         <button class="btn btn-lg btn-primary btn-block" type="button" data-mt="Login" onclick="Server.login()">登入</button>
       </form>
     </div>
+
+    <footer class="text-center">
+      <button class="btn btn-info" type="button" data-toggle="collapse" data-target="#footersharediv" aria-expanded="false" aria-controls="collapseExample">
+        <span class="glyphicon glyphicon-link" aria-hidden="true"></span>
+      </button>
+      <div class="row">
+        <div id="footersharediv" class="collapse col-md-offset-3 col-md-6 bg-info"></div>
+      </div>
+    </footer>
+
     <script src="js/jquery.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
 <script>
@@ -144,6 +154,7 @@ window.onhashchange = function () {
   filepath = window.location.hash.substring(1);
   loadFile(filepath);
   show();
+  sharebutton();
 }
 
 window.onbeforeunload = function(){}
@@ -259,6 +270,22 @@ function saveFile() {
   var md = $('#mdBox').val();
   Server.save(path().domain, path().file, md);
 }
+
+// create/modify share button
+  function sharebutton() {
+    var c = 'web';
+    var currenpath = window.location;
+    $("#footersharediv").text('' +
+      currenpath.origin +
+      currenpath.pathname.split(c)[0] + c
+      + '/db/' + path().domain +
+      '/link/' + path().file +
+      '.html');
+  }
+  $(window).load(function() {
+    sharebutton();
+  });
+//
 
 // 以下這種作法是為了加快速度，避免一開始載入 MathJax 花太久時間 ...
 document.write('<'+'script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_SVG"></'+'script>');  // 刻意把 '</'+'script>' 分開，避免瀏覽器認為是真的 script 區塊

@@ -1,0 +1,13 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="favicon.ico">
+    <meta property="description" />
+    <meta property="og:site_name" content="wikidown" />
+    <meta property="og:title" content="標題：save test 18" />
+    <meta property="og:type" content="article" />
+  </head>
+  <body>
+    <script>window.location.replace("/web/wikidown.html#wikidown:test");</script>
+  </body>
+</html>
