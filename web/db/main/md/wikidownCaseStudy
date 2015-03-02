@@ -113,7 +113,7 @@ function show(md) {
   switchPanel('showPanel');
 }
 
-var mdNewFile = '# 標題：文件不存在\n\n您可以編輯後存檔！\n## 語法\n* [[內部連結]](innerLink)\n* [外部連結](link)';
+var mdNewFile = '# 標題：文件不存在\n\n您可以編輯後存檔！\n## 語法\n* [內部連結](../htm/innerLink.html)\n* [外部連結](link)';
 
 function showFile(filename) {
   if (filename === null || filename === '')

@@ -1,5 +1,5 @@
 HTML = $(patsubst md/%,%.html,$(wildcard md/*))
-MD     = ../title ../preface editor ../license ../focus focus2 focus3 ../people people1 people2 people4 ../article article1 ../info ../reflink
+MD     = ../title ../preface editor license ../focus focus2 focus3 ../people people1 people2 people4 ../article article1 info ../reflink
 HARG =  --data-dir=../ -c ../epub.css -B ../header.htm -A ../footer.htm --toc --base-header-level=1 --toc-depth=2
 
 .PHONY: all
@@ -25,7 +25,7 @@ pdf: epub
 htm: init $(HTML)
 
 %.html:
-	cd book; pandoc $(HARG) $* ../reflink -o ../htm/$@
+	cd book; pandoc $(HARG) $* ../reflink -o $@
 	
 clean: 
 	rm book/*.*

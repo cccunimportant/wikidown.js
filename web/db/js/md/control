@@ -19,15 +19,15 @@ else
 
 寫完上述程式之後，請務必將檔案儲存成 UTF8 的格式 (Unicode 8 位元模式) ，我的習慣是採用 Notepad++ 這個編輯器，然後儲存成「UTF8 檔首無 BOM」的格式，如下圖所示：
 
-![[圖、在 Notepad++ 中設定存檔格式為 UTF8]](NotepadUtf8.jpg)
+![圖、在 Notepad++ 中設定存檔格式為 UTF8](../img/NotepadUtf8.jpg)
 
 這樣，程式就可以正常印出「繁體中文」，結果如下所示：
 
-![[圖、用 node 執行 score.js 的結果]](ifScoreRun.jpg)
+![圖、用 node 執行 score.js 的結果](../img/ifScoreRun.jpg)
 
 如果您沒有儲存成 UTF8 的格式，而是用預設的 ANSI 格式，那麼印出來的中文就會看不到 (或者變成亂碼)，如下圖所示，這是因為 node.js 預設採用 UTF8 編碼的緣故。
 
-![[圖、中文存成 ANSI 格式導致無法正常顯示的情況]](AnsiEncodeError.jpg)
+![圖、中文存成 ANSI 格式導致無法正常顯示的情況](../img/AnsiEncodeError.jpg)
 
 因此請務必要將檔案儲存成 UTF8 格式，這樣會比較不容易出錯。
 

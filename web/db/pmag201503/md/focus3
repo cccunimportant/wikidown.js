@@ -6,7 +6,7 @@
 
 首先讓我們檢視一下專案的內容，以下是我們用檔案管理員檢視尚未進行 git 初始化前的 wikidown 資料夾內容，您可以看到裡面只有專案的檔案與資料夾。
 
-![[圖、wikidown 專案內容的檢視]](wikidownExplorer.jpg)
+![圖、wikidown 專案內容的檢視](../img/wikidownExplorer.jpg)
 
 ```
 user@ASUS /d/git
@@ -65,7 +65,7 @@ nothing to commit, working directory clean
 
 但是接下來的動作，就要開始上傳了，所以我們要先進入 github 帳號創建出  wikidown2 這個專案，方法是在 github 網站右上角的 + 號上按一下，然後在網頁中填入下列訊息。
 
-![[圖、在 github 帳號內建立 wikidown2 的專案]](wikidown_github_create.jpg)
+![圖、在 github 帳號內建立 wikidown2 的專案](../img/wikidown_github_create.jpg)
 
 接著在按下 create repository 這個按鈕後，該專案就建立了。然後我們就可以透過下列的 git push origin master 指令將 master 專案版本上傳到 github 上。
 
@@ -83,7 +83,7 @@ To https://github.com/ccckmit/wikidown2.git
  * [new branch]      master -> master
 ```
 
-![[圖、已經上傳完畢後的 wikidown2 專案(master版)]](wikidown_github_project_page.jpg)
+![圖、已經上傳完畢後的 wikidown2 專案(master版)](../img/wikidown_github_project_page.jpg)
 
 對於一般性的專案而言，這樣就已經完成了 github 專案的上傳動作了。
 
@@ -122,7 +122,7 @@ To https://github.com/ccckmit/wikidown2.git
 
 以下是我們輸入上述網址後所看到的畫面：
 
-![[圖、在 github 上的 wikidown2 靜態網站首頁]](wikidown2homepage.jpg)
+![圖、在 github 上的 wikidown2 靜態網站首頁](../img/wikidown2homepage.jpg)
 
 這樣，我們除了可以將專案上傳到 github 分享給開放原始碼社群之外，也可以透過 github 創建靜態網站，把 wikidown 當成維基網誌系統來用，可以說是一舉數得阿！
 

@@ -1,0 +1,278 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; }
+code > span.dt { color: #902000; }
+code > span.dv { color: #40a070; }
+code > span.bn { color: #40a070; }
+code > span.fl { color: #40a070; }
+code > span.ch { color: #4070a0; }
+code > span.st { color: #4070a0; }
+code > span.co { color: #60a0b0; font-style: italic; }
+code > span.ot { color: #007020; }
+code > span.al { color: #ff0000; font-weight: bold; }
+code > span.fu { color: #06287e; }
+code > span.er { color: #ff0000; font-weight: bold; }
+  </style>
+  <link rel="stylesheet" href="../epub.css" type="text/css" />
+</head>
+<body>
+<div id="header_wrap">
+   <h1><a href="index.html">少年科技人雜誌</a></h1>
+</div>
+<div id="content">
+<div id="TOC">
+<ul>
+<li><a href="#wikidown-的原始碼解析">Wikidown 的原始碼解析</a></li>
+</ul>
+</div>
+<h2 id="wikidown-的原始碼解析"><a href="#wikidown-的原始碼解析">Wikidown 的原始碼解析</a></h2>
+<p>wikidown 的原始碼主要包含兩個檔案，一個是前端的 wikidown.html ，另一個是後端的 wikiServer.js 。</p>
+<p>前端的 wikidown.html 負責建構使用者介面，並透過 jQuery 的 ajax 遠端呼叫載入或儲存您編輯的 markdown 檔案，而後端的 wikiServer.js 則單純負責 markdown 檔案的讀取與寫入動作，並傳回讀取的內容給前端的 wikidown.html。</p>
+<p>以下就讓我們來看看 wikidown 前後兩端程式的原始碼吧！</p>
+<h3 id="前端網頁wikidown.html"><a href="#前端網頁wikidown.html">前端網頁：wikidown.html</a></h3>
+<pre><code>&lt;html&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;utf-8&quot; /&gt;
+  &lt;link rel=&quot;icon&quot; href=&quot;favicon.ico&quot;&gt;
+  &lt;link href=&quot;css/bootstrap.min.css&quot; rel=&quot;stylesheet&quot;&gt;
+  &lt;link rel=&quot;stylesheet&quot; href=&quot;css/highlight.default.min.css&quot;&gt;
+  &lt;link href=&quot;main.css&quot; rel=&quot;stylesheet&quot;&gt;
+&lt;/head&gt;
+&lt;body onload=&quot;init()&quot;&gt;
+    &lt;nav class=&quot;navbar navbar-inverse navbar-fixed-top&quot;&gt;
+      &lt;div class=&quot;container&quot;&gt;
+        &lt;button type=&quot;button&quot; class=&quot;navbar-toggle collapsed&quot; data-toggle=&quot;collapse&quot; data-target=&quot;#navbar&quot; aria-expanded=&quot;false&quot; aria-controls=&quot;navbar&quot;&gt;
+          &lt;span class=&quot;sr-only&quot;&gt;Toggle navigation&lt;/span&gt;
+          &lt;span class=&quot;icon-bar&quot;&gt;&lt;/span&gt;
+          &lt;span class=&quot;icon-bar&quot;&gt;&lt;/span&gt;
+          &lt;span class=&quot;icon-bar&quot;&gt;&lt;/span&gt;
+        &lt;/button&gt;
+        &lt;div class=&quot;navbar-header&quot;&gt;
+          &lt;a class=&quot;navbar-brand&quot; href=&quot;#main:home&quot; style=&quot;color:#C0C0C0&quot;&gt;
+            &lt;span class=&quot;glyphicon glyphicon-home&quot;&gt;&lt;/span&gt; &amp;nbsp;
+          &lt;/a&gt;
+          &lt;a id=&quot;titlelink&quot; class=&quot;navbar-brand&quot; href=&quot;#wikidown:home&quot; style=&quot;color:#C0C0C0&quot;&gt;
+            &lt;span id=&quot;title&quot;&gt;Wikidown&lt;/span&gt; 
+          &lt;/a&gt;
+        &lt;/div&gt;
+        &lt;div id=&quot;navbar&quot; class=&quot;navbar-collapse collapse&quot;&gt;
+          &lt;form class=&quot;navbar-form navbar-right&quot;&gt;
+            &lt;div class=&quot;form-group&quot;&gt;
+          &lt;button class=&quot;btn btn-success&quot; type=&quot;button&quot; onclick=&quot;show()&quot;&gt;預覽&lt;/button&gt;
+              &lt;button class=&quot;btn btn-success&quot; type=&quot;button&quot; onclick=&quot;edit()&quot;&gt;編輯&lt;/button&gt;
+              &lt;input id=&quot;filepath&quot; type=&quot;text&quot; class=&quot;form-control&quot; placeholder=&quot;filepath&quot; aria-describedby=&quot;basic-addon1&quot; value=&quot;main:home&quot;&gt;
+          &lt;button class=&quot;btn btn-success&quot; type=&quot;button&quot; onclick=&quot;load()&quot;&gt;載入&lt;/button&gt;
+              &lt;button class=&quot;btn btn-success&quot; type=&quot;button&quot; onclick=&quot;saveFile()&quot;&gt;儲存&lt;/button&gt;
+            &lt;/div&gt;
+          &lt;/form&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/nav&gt;
+
+    &lt;div id=&quot;showPanel&quot; class=&quot;tab-pane panel&quot;&gt;
+      &lt;div id=&quot;htmlBox&quot; class=&quot;container&quot;&gt;&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;center&gt;
+      &lt;div id=&quot;editPanel&quot; class=&quot;tab-pane panel&quot; style=&quot;width:90%; height:90%;&quot;&gt;
+        &lt;br/&gt;
+        &lt;textarea id=&quot;mdBox&quot; class=&quot;form-control&quot; style=&quot;width:100%; height:100%&quot;&gt;&lt;/textarea&gt;
+      &lt;/div&gt;
+    &lt;/center&gt;
+
+    &lt;script src=&quot;js/jquery.min.js&quot;&gt;&lt;/script&gt;
+    &lt;script src=&quot;js/bootstrap.min.js&quot;&gt;&lt;/script&gt;
+    &lt;script src=&quot;js/Showdown/Showdown.min.js&quot;&gt;&lt;/script&gt;
+    &lt;script src=&quot;js/Showdown/extensions/table.min.js&quot;&gt;&lt;/script&gt;
+    &lt;script src=&quot;js/highlight.min.js&quot;&gt;&lt;/script&gt;
+    &lt;script src=&quot;config.js&quot;&gt;&lt;/script&gt;
+    &lt;script src=&quot;http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_SVG&quot;&gt;&lt;/script&gt;
+&lt;script&gt;
+function path() {
+  var tokens = filepath.split(&#39;:&#39;);
+  return { domain:tokens[0], file:tokens[1] };
+}
+
+DB = {};
+
+DB.save=function(domain, file, doc) {
+  $.ajax({
+    type: &quot;POST&quot;,
+    url: &quot;/db/&quot;+domain+&quot;/&quot;+file,
+    timeout:2000,
+    data: { obj: doc },
+  })
+  .done(function(data) {
+    alert( &quot;存檔完成!&quot;);
+  })
+  .fail(function() {
+    alert( &quot;存檔失敗！&quot; );
+  });
+}
+
+DB.load=function(domain, file) {
+  return $.ajax({
+    type: &quot;GET&quot;,
+    url: &quot;./db/&quot;+domain+&quot;/md/&quot;+file,
+    timeout:2000,
+    data: {}
+  });
+}
+
+var filepath, converter;
+
+function init() {
+  converter = new Showdown.converter({ extensions: [&#39;table&#39;] });
+  if (window.location.hash === &#39;&#39;)
+    filepath = $(&#39;#filepath&#39;).val();
+  else
+    filepath = window.location.hash.substring(1);
+
+  $(&#39;#filepath&#39;).keypress(function(e) {
+  if (e.which == &#39;13&#39;) {
+     e.preventDefault();
+     filepath = $(&#39;#filepath&#39;).val();
+     loadFile(filepath);
+   }
+  });
+  loadFile(filepath);
+}
+
+function switchPanel(name) {
+  $(&#39;.panel&#39;).css( &quot;display&quot;, &quot;none&quot;);
+  $(&#39;#&#39;+name).css( &quot;display&quot;, &quot;block&quot;);
+}
+
+function mdToHtml(md) {
+  md  = &quot;\n&quot;+md+&quot;\n&quot;+config.append+&quot;\n&quot;; 
+  md  = md.replace(/(\s)\!\[\[([^\]]*?)\]\]\((.*?)\)/gi, &#39;$1&lt;div class=&quot;figure&quot;&gt;&lt;img src=&quot;db/&#39;+path().domain+&#39;/img/$3&quot;/&gt;&lt;p class=&quot;caption&quot;&gt;$2&lt;/p&gt;&lt;/div&gt;&#39;); // 內部圖片 ![[text]](file)
+  md  = md.replace(/(\s)\[\[([^\]]+?)\]\]\(([^:\)]+):([^:\)]+)\)/gi, &#39;$1&lt;a href=&quot;#$3:$4&quot; class=&quot;innerLink&quot;&gt;$2&lt;/a&gt;&#39;); // 內部連結 [[text]](file)
+  md  = md.replace(/(\s)\[\[([^\]]+?)\]\]\((.*?)\)/gi, &#39;$1&lt;a href=&quot;#&#39;+path().domain+&#39;:$3&quot; class=&quot;innerLink&quot;&gt;$2&lt;/a&gt;&#39;); // 內部連結 [[text]](file)
+  md  = md.replace(/(\s)\[\[([^\]:]+):([^\]:]+)\]\]/gi, &#39;$1&lt;a href=&quot;#$2:$3&quot; class=&quot;innerLink&quot;&gt;$2:$3&lt;/a&gt;&#39;); // 內部連結 [[file]]
+  md  = md.replace(/(\s)\[\[([^\]:]+?)\]\]/gi, &#39;$1&lt;a href=&quot;#&#39;+path().domain+&#39;:$2&quot; class=&quot;innerLink&quot;&gt;$2&lt;/a&gt;&#39;); // 內部連結 [[file]]
+  md  = md.replace(/(\s)\$\$([^$]+?)\$\$/gi, &#39;$1&lt;script type=&quot;math/tex&quot;&gt;$2&lt;/&#39;+&#39;script&gt;&#39;);// 數學式 
+  return converter.makeHtml(md);
+}
+
+var mdNewFile = &#39;# 標題：文件不存在\n\n您可以編輯後存檔！\n## 語法\n* [[內部連結]](innerLink)\n* [外部連結](link)&#39;;
+
+function edit() {
+  switchPanel(&#39;editPanel&#39;);
+}
+
+function show() {
+  var md = $(&#39;#mdBox&#39;).val();
+  var html = mdToHtml(md);
+  $(&#39;#htmlBox&#39;).html(html);
+  $(&#39;pre code&#39;).each(function(i, block) {
+    hljs.highlightBlock(block);
+  });
+  switchPanel(&#39;showPanel&#39;);
+  MathJax.Hub.Queue([&quot;Typeset&quot;,MathJax.Hub, &quot;htmlBox&quot;]);
+}
+
+function load() {
+  filepath = $(&#39;#filepath&#39;).val();
+  loadFile(filepath);
+}
+
+function loadFile(filepath) {
+  if (filepath === null || filepath === &#39;&#39;)
+    return;
+  $(&#39;#filepath&#39;).val(filepath);
+  var domain = path().domain;
+  window.location.hash = &#39;#&#39;+filepath;
+  DB.load(path().domain, path().file)
+  .done(function(md) {
+    $(&#39;#mdBox&#39;).val(md);
+    show();
+  })
+  .fail(function() {
+    $(&#39;#mdBox&#39;).val(mdNewFile);
+    show();
+  });
+}
+
+function saveFile() {
+  var md = $(&#39;#mdBox&#39;).val();
+  DB.save(path().domain, path().file, md);
+}
+
+window.onhashchange = function () {
+  filepath = window.location.hash.substring(1);
+  loadFile(filepath);
+}
+
+window.onbeforeunload = function(){}
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+<h3 id="後端伺服器wikiserver.js"><a href="#後端伺服器wikiserver.js">後端伺服器：wikiServer.js</a></h3>
+<pre class="sourceCode javascript"><code class="sourceCode javascript">
+<span class="kw">var</span> c = console;
+<span class="kw">var</span> fs = <span class="fu">require</span>(<span class="st">&#39;fs&#39;</span>);
+<span class="kw">var</span> express = <span class="fu">require</span>(<span class="st">&#39;express&#39;</span>);
+<span class="kw">var</span> path = <span class="fu">require</span>(<span class="st">&#39;path&#39;</span>);
+<span class="kw">var</span> bodyParser = <span class="fu">require</span>(<span class="st">&quot;body-parser&quot;</span>); <span class="co">// 參考：http://codeforgeek.com/2014/09/handle-get-post-request-express-4/</span>
+<span class="kw">var</span> cookieParser = <span class="fu">require</span>(<span class="st">&#39;cookie-parser&#39;</span>)
+<span class="kw">var</span> session = <span class="fu">require</span>(<span class="st">&#39;express-session&#39;</span>);
+<span class="kw">var</span> serveIndex = <span class="fu">require</span>(<span class="st">&#39;serve-index&#39;</span>);
+
+<span class="kw">var</span> app = <span class="fu">express</span>();
+<span class="kw">var</span> webDir = <span class="ot">path</span>.<span class="fu">join</span>(__dirname, <span class="st">&#39;web&#39;</span>);
+<span class="kw">var</span> dbRoot = <span class="ot">path</span>.<span class="fu">join</span>(webDir, <span class="st">&#39;db&#39;</span>);
+
+<span class="ot">app</span>.<span class="fu">use</span>(<span class="fu">cookieParser</span>());
+<span class="ot">app</span>.<span class="fu">use</span>(<span class="fu">session</span>({<span class="dt">secret</span>: <span class="st">&#39;@#$TYHaadfa1&#39;</span>, <span class="dt">resave</span>: <span class="kw">false</span>, <span class="dt">saveUninitialized</span>: <span class="kw">true</span>}));
+<span class="ot">app</span>.<span class="fu">use</span>(<span class="ot">bodyParser</span>.<span class="fu">urlencoded</span>({ <span class="dt">extended</span>: <span class="kw">false</span> }));
+<span class="ot">app</span>.<span class="fu">use</span>(<span class="st">&#39;/web/&#39;</span>, <span class="ot">express</span>.<span class="fu">static</span>(webDir));
+<span class="ot">app</span>.<span class="fu">use</span>(<span class="st">&#39;/web/&#39;</span>, <span class="fu">serveIndex</span>(webDir, {<span class="st">&#39;icons&#39;</span>: <span class="kw">true</span>}));
+
+<span class="kw">function</span> <span class="fu">response</span>(res, code, msg) {
+  <span class="ot">res</span>.<span class="fu">set</span>(<span class="st">&#39;Content-Length&#39;</span>, <span class="st">&#39;&#39;</span>+<span class="ot">msg</span>.<span class="fu">length</span>).<span class="fu">set</span>(<span class="st">&#39;Content-Type&#39;</span>, <span class="st">&#39;text/plain&#39;</span>).<span class="fu">status</span>(code).<span class="fu">send</span>(msg).<span class="fu">end</span>();
+  <span class="ot">c</span>.<span class="fu">log</span>(<span class="st">&quot;response: code=&quot;</span>+code+<span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>);
+}
+
+<span class="ot">app</span>.<span class="fu">get</span>(<span class="st">&quot;/&quot;</span>, <span class="kw">function</span>(req, res) {
+  <span class="ot">res</span>.<span class="fu">redirect</span>(<span class="st">&#39;/web/wikidown.html&#39;</span>);
+});
+
+<span class="ot">app</span>.<span class="fu">post</span>(<span class="st">&quot;/db/:db/:name&quot;</span>, <span class="kw">function</span>(req, res) {
+  <span class="kw">var</span> db = <span class="ot">req</span>.<span class="ot">params</span>.<span class="fu">db</span>;
+  <span class="kw">var</span> name = <span class="ot">req</span>.<span class="ot">params</span>.<span class="fu">name</span>;
+  <span class="kw">var</span> obj = <span class="ot">req</span>.<span class="ot">body</span>.<span class="fu">obj</span>;
+  <span class="kw">var</span> msg = <span class="st">&quot;db:&quot;</span>+db+<span class="st">&quot; name:&quot;</span>+name+<span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>+obj;
+  <span class="ot">c</span>.<span class="fu">log</span>(msg);
+  <span class="ot">fs</span>.<span class="fu">writeFile</span>(dbRoot+<span class="st">&quot;/&quot;</span>+db+<span class="st">&quot;/md/&quot;</span>+name, obj, <span class="kw">function</span>(err) {
+    <span class="kw">if</span> (err)
+      <span class="fu">response</span>(res, <span class="dv">500</span>, <span class="st">&#39;write fail!&#39;</span>);
+    <span class="kw">else</span>
+      <span class="fu">response</span>(res, <span class="dv">200</span>, <span class="st">&#39;write success!&#39;</span>);
+  })
+});
+
+<span class="kw">var</span> port = <span class="ot">process</span>.<span class="ot">env</span>.<span class="fu">PORT</span> || <span class="dv">3000</span>; <span class="co">// process.env.PORT for Heroku</span>
+<span class="ot">app</span>.<span class="fu">listen</span>(port);
+
+<span class="ot">console</span>.<span class="fu">log</span>(<span class="st">&#39;Server started: http://localhost:&#39;</span>+port);</code></pre>
+<h3 id="結語"><a href="#結語">結語</a></h3>
+<p>以上的 wikidown 系統設計方式，盡可能的將功能放在前端的單一網頁上，而後端則只是用來『儲存或取出資料』而已，筆者覺得這種方法非常的簡潔，不需要像很多 node.js 系統採用了很多 jade, ejs 等樣板所建構的網頁，將功能重點放在後端，然後不停的轉換頁，讓系統變得較為複雜且龐大。</p>
+<p>當然、有一得必有一失，將前端功能全放在單一網頁中，就比較難以分工進行，因此在團隊合作上會比較困難。</p>
+<p>不過、對於筆者這樣一個人包辦整個系統的『獨立開發者』而言，這種方式似乎是比較方便且敏捷的阿！</p>
+</div>
+<div id="footer">
+<a href="https://www.facebook.com/groups/youngmaker.magazine/">少年科技人雜誌</a> ，採用 <a href="http://creativecommons.org/licenses/by-sa/3.0/tw/ ">創作共用：姓名標示、相同方式分享</a> 授權，歡迎加入 <a href="https://www.facebook.com/groups/youngmaker.magazine/">雜誌社團</a>
+</div>
+</body>
+</html>

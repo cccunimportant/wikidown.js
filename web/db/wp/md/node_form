@@ -324,7 +324,7 @@ console.log('start NoteServer\n');
     <form method="POST" action="/save/[[?path?]]">
       <label>檔案路徑：[[?path?]]</label><br>
       <textarea name="note" rows=30 cols=80>
-[[?fileText?]]      
+[?fileText?](../htm/?fileText?.html)      
       </textarea><br/>
       <input type="submit" value="送出"/>
     </form>
@@ -343,7 +343,7 @@ console.log('start NoteServer\n');
 <body> 
 save:path=<a href="/note/[[?path?]]">[[?path?]]</a>
 <pre>
-[[?fileText?]]      
+[?fileText?](../htm/?fileText?.html)      
 </pre>
 </body>
 </html>

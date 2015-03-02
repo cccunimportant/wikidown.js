@@ -85,13 +85,13 @@ Hello!
 
 檢視檔案：<https://dl.dropbox.com/u/101584453/web/wp/code/hello4.htm>
 
-![[圖、上述網頁的檢視畫面]](HtmlHello4.png)
+![圖、上述網頁的檢視畫面](../img/HtmlHello4.png)
 
 其中第一句的 `<!DOCTYPE html>` 是告訴瀏覽器，這個文件是一個 HTML 檔案，而  `<meta charset='utf-8'>` 這句話，則是告訴瀏覽器這個文件的編碼是用 UTF-8 的格式。
 
 所以您必須將上述檔案，儲存成 unicode 的 UTF-8 格式，這樣網頁才能正確運作，否則就有可能出現亂碼的情況，以下是筆者使用 Notepad++ 設定 UTF-8 格式的情況。
 
-![[圖、筆者使用 Notepad++ 設定 UTF-8 格式的畫面]](NotepadUtf8.png)
+![圖、筆者使用 Notepad++ 設定 UTF-8 格式的畫面](../img/NotepadUtf8.png)
 
 ## 格式化
 
@@ -127,7 +127,7 @@ Hello!
 
 檢視檔案：<https://dl.dropbox.com/u/101584453/web/wp/code/format.htm>
 
-![[圖、各種格式標記的網頁檢視畫面]](HtmlFormat.png)
+![圖、各種格式標記的網頁檢視畫面](../img/HtmlFormat.png)
 
 ## 標題
 
@@ -152,7 +152,7 @@ HTML 的章節標題共有六種層次，從 h1 到 h6，通常 h1 代表最大�
 
 檢視檔案：<https://dl.dropbox.com/u/101584453/web/wp/code/header1_6.htm>
 
-![[圖、Header 1-6 的網頁檢視畫面]](HtmlHeader1_6.png)
+![圖、Header 1-6 的網頁檢視畫面](../img/HtmlHeader1_6.png)
 
 ## 影像 Image
 
@@ -168,7 +168,7 @@ HTML 的章節標題共有六種層次，從 h1 到 h6，通常 h1 代表最大�
 
 檢視檔案：<https://dl.dropbox.com/u/101584453/web/wp/code/img.htm>
 
-![[圖、img 指令的網頁檢視畫面]](HtmlImg.png)
+![圖、img 指令的網頁檢視畫面](../img/HtmlImg.png)
 
 評論：竟然趁機為自己的書打廣告，真是太惡劣了！....
 
@@ -200,7 +200,7 @@ HTML 的章節標題共有六種層次，從 h1 到 h6，通常 h1 代表最大�
 
 檢視檔案：<https://dl.dropbox.com/u/101584453/web/wp/code/table.htm>
 
-![[表格範例的顯示結果]](table.jpg)
+![表格範例的顯示結果](../img/table.jpg)
 
 ## 項目 list
 
@@ -226,7 +226,7 @@ HTML 的項目是用 `<li>...</li>` 語法所框住的，如果在項目的外�
 
 檢視檔案：<https://dl.dropbox.com/u/101584453/web/wp/code/list.htm>
 
-![[項目清單的顯示結果]](list.jpg)
+![項目清單的顯示結果](../img/list.jpg)
 
 
 ## 表單 Form
@@ -258,7 +258,7 @@ HTML 的項目是用 `<li>...</li>` 語法所框住的，如果在項目的外�
 
 檢視檔案：<https://dl.dropbox.com/u/101584453/web/wp/code/form.htm>
 
-![[表單的顯示結果]](form.jpg)
+![表單的顯示結果](../img/form.jpg)
 
 在上述的範例中，當 submit 類型的送出鈕被按下後，瀏覽器會將這些填寫的資訊，以第一章所說的 GET/POST 方式，發送給伺服器，如果 method 欄位是 GET，那麼會採用在 HTTP 表頭網址處傳送 singup?user=xxx&password=xxx .....這樣的形式送出，這種方式會將密碼顯示在瀏覽器的網址列上，比較容易被看到，若 method 欄位是 POST，則會在 HTTP 表頭尾端加上 user=xxx&password=xxx ... 的資訊，不會在網址列上被看到。當然、如果有人監控網路上訊息的話，還是會看得到這些輸入資訊。
 

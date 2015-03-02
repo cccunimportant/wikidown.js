@@ -25,31 +25,35 @@
           <div id="titleHead" class="navbar-header" style="color:#C0C0C0"></div>
 		  <ul class="nav navbar-nav navbar-right">
             <li class="dropdown">
-              <a class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-globe"></span><span class="caret"></span></a>
+              <a class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-globe"></span><!--<span class="caret">--></span></a>
               <ul class="dropdown-menu" role="menu">
                 <li><a onclick="Mt.switchLang('us')">English</a></li>
                 <li><a onclick="Mt.switchLang('tw')">中文</a></li>
               </ul>
             </li>
 		  </ul>
-          <form class="navbar-form navbar-right">
-            <div class="form-group">
-              <input id="filepath" type="text" class="form-control" placeholder="filepath" aria-describedby="basic-addon1">
-			  <button class="btn btn-success" type="button" onclick="load()">載入</button>
-              <button class="btn btn-success" type="button" onclick="saveFile()">儲存</button>
-			</div>
-          </form>
 		  <ul class="nav navbar-nav navbar-right">
             <li class="dropdown">
-              <a class="dropdown-toggle" data-toggle="dropdown" id="modeMenu">預覽</a>
-              <ul class="dropdown-menu" role="menu">
+              <a class="dropdown-toggle" data-toggle="dropdown" id="modeMenu">登入</a>
+                <ul class="dropdown-menu" role="menu">
+				<!--
                 <li><a onclick="show()">預覽</a></li>
                 <li><a onclick="edit()">編輯</a></li>
+				-->
                 <li><a onclick="login()">登入</a></li>
                 <li><a onclick="logout()">登出</a></li>
               </ul>
             </li>
 		  </ul>
+          <form class="navbar-form navbar-right">
+            <div class="form-group">
+              <input id="filepath" type="hidden" class="form-control" placeholder="filepath" aria-describedby="basic-addon1">
+			  <button class="btn btn-success" type="button" onclick="show()">預覽</button>
+			  <button class="btn btn-success" type="button" onclick="edit()">編輯</button>
+<!--			  <button class="btn btn-success" type="button" onclick="load()">載入</button>-->
+              <button class="btn btn-success" type="button" onclick="saveFile()">儲存</button>
+			</div>
+          </form>		  
         </div>
       </div>
     </nav>
@@ -60,7 +64,7 @@
     <center> <!-- 編輯 -->
       <div id="panelEdit" class="tab-pane panel" style="width:90%; height:90%;">
         <br/>
-        <textarea id="mdBox" class="form-control" style="width:100%; height:100%"></textarea>
+        <textarea id="wdBox" class="form-control" style="width:100%; height:100%"></textarea>
       </div>
     </center>
     <div id="panelLogin" class="tab-pane panel"> <!-- 登入 -->
@@ -99,7 +103,7 @@ Server.save=function(domain, file, doc) {
 Server.load=function(domain, file) {
   return $.ajax({
     type: "GET",
-    url: "./db/"+domain+"/md/"+file,
+    url: "./db/"+domain+"/wd/"+file,
 	timeout:2000,
     data: {}
   });
@@ -151,7 +155,7 @@ window.onbeforeunload = function(){}
 $('.panel').css( "display", "none");
 
 var filepath, converter;
-var mdNewFile = '# 標題：文件不存在\n\n您可以編輯後存檔！\n## 語法\n* [[內部連結]](innerLink)\n* [外部連結](link)';
+var wdNewFile = '# 標題：文件不存在\n\n您可以編輯後存檔！\n## 語法\n* [[內部連結]](innerLink)\n* [外部連結](link)';
 
 function init() {
   converter = new Showdown.converter({ extensions: ['table'] });
@@ -173,27 +177,27 @@ function switchPanel(name) {
   $('#'+name).css( "display", "block");
 }
 
-function templateApply(md) {
+function templateApply(wd) {
   var templateNow = template[path().domain];
   if (templateNow===undefined)
     templateNow = template['wikidown'];
-  return templateNow.split('%md%').join(md); // 不能用 replace(reg, str), 因為 str 中可能有參數 ＄...$ 符號，所以改用 split + join
+  return templateNow.split('%wd%').join(wd); // 不能用 replace(reg, str), 因為 str 中可能有參數 ＄...$ 符號，所以改用 split + join
 }
 
-function mdToHtml(md) {
-  md  = templateApply(md);
-  md  = md.replace(/(\s)\!\[\[([^\]]*?)\]\]\((.*?)\)/gi, '$1<div class="figure"><img src="db/'+path().domain+'/img/$3"/><p class="caption">$2</p></div>'); // 內部圖片 ![[text]](file)
-  md  = md.replace(/(\s)\[\[([^\]]+?)\]\]\(([^:\)]+):([^:\)]+)\)/gi, '$1<a href="#$3:$4" class="innerLink">$2</a>'); // 內部連結 [[text]](file)
-  md  = md.replace(/(\s)\[\[([^\]]+?)\]\]\((.*?)\)/gi, '$1<a href="#'+path().domain+':$3" class="innerLink">$2</a>'); // 內部連結 [[text]](file)
-  md  = md.replace(/(\s)\[\[([^\]:]+):([^\]:]+)\]\]/gi, '$1<a href="#$2:$3" class="innerLink">$2:$3</a>'); // 內部連結 [[file]]
-  md  = md.replace(/(\s)\[\[([^\]:]+?)\]\]/gi, '$1<a href="#'+path().domain+':$2" class="innerLink">$2</a>'); // 內部連結 [[file]]
-  md  = md.replace(/(\s)\$\$([^$]+?)\$\$/gi, '$1<script type="math/tex">$2</'+'script>');// 數學式 $$[latex]$$,  刻意把 '</'+'script>' 分開，避免瀏覽器認為是真的 script 區塊
-  return converter.makeHtml(md);
+function wdToHtml(wd) {
+  wd  = '\n'+wd+' ';
+  wd  = wd.replace(/(\s)\!\[\[([^\]]*?)\]\]\((.*?)\)/gi, '$1<div class="figure"><img src="db/'+path().domain+'/img/$3"/><p class="caption">$2</p></div>'); // 內部圖片 ![[text]](file)
+  wd  = wd.replace(/(\s)\[\[([^\]]+?)\]\]\(([^:\)]+):([^:\)]+)\)/gi, '$1<a href="#$3:$4" class="innerLink">$2</a>'); // 內部連結 [[text]](domain:file)
+  wd  = wd.replace(/(\s)\[\[([^\]]+?)\]\]\((.*?)\)/gi, '$1<a href="#'+path().domain+':$3" class="innerLink">$2</a>'); // 內部連結 [[text]](file)
+  wd  = wd.replace(/(\s)\[\[([^\]:]+):([^\]:]+)\]\]/gi, '$1<a href="#$2:$3" class="innerLink">$2:$3</a>'); // 內部連結 [[file]]
+  wd  = wd.replace(/(\s)\[\[([^\]:]+?)\]\]/gi, '$1<a href="#'+path().domain+':$2" class="innerLink">$2</a>'); // 內部連結 [[file]]
+  wd  = wd.replace(/(\s)\$\$([^$]+?)\$\$/gi, '$1<script type="math/tex">$2</'+'script>');// 數學式 $$[latex]$$,  刻意把 '</'+'script>' 分開，避免瀏覽器認為是真的 script 區塊
+  return converter.makeHtml(wd);
 }
 
 function login() {
   switchPanel('panelLogin');
-  $('#modeMenu').html('登入');
+//  $('#modeMenu').html('登入');
 }
 
 function logout() {
@@ -202,12 +206,13 @@ function logout() {
 
 function edit() {
   switchPanel('panelEdit');
-  $('#modeMenu').html('編輯');
+//  $('#modeMenu').html('編輯');
 }
 
 function show() {
-  var md = $('#mdBox').val();
-  var html = mdToHtml(md);
+  var wd = $('#wdBox').val();
+  wd  = templateApply(wd);
+  var html = wdToHtml(wd);
   $('#htmlBox').html(html);
   $('pre code').each(function(i, block) {
     hljs.highlightBlock(block);
@@ -215,7 +220,7 @@ function show() {
   switchPanel('panelShow');
   if (typeof(MathJax) !== 'undefined')
     MathJax.Hub.Queue(["Typeset",MathJax.Hub, "htmlBox"]);
-  $('#modeMenu').html('預覽');
+//  $('#modeMenu').html('預覽');
   showTitle();
 }
 
@@ -228,7 +233,8 @@ function showTitleHead(domain) {
   var titleHead = title['wikidown'];
   if (title[domain] !== undefined)
     titleHead = title[domain];
-  $('#titleHead').html(titleHead);
+  var titleHtml = wdToHtml(titleHead);
+  $('#titleHead').html(titleHtml);
 }
 
 function showTitle() {
@@ -245,19 +251,19 @@ function loadFile(filepath) {
   showTitleHead(path().domain);
   window.location.hash = '#'+filepath;
   Server.load(path().domain, path().file)
-  .done(function(md) {
-    $('#mdBox').val(md);
+  .done(function(wd) {
+    $('#wdBox').val(wd);
     show();
   })
   .fail(function() {
-    $('#mdBox').val(mdNewFile);
+    $('#wdBox').val(wdNewFile);
     show();
   });
 }
 
 function saveFile() {
-  var md = $('#mdBox').val();
-  Server.save(path().domain, path().file, md);
+  var wd = $('#wdBox').val();
+  Server.save(path().domain, path().file, wd);
 }
 
 // 以下這種作法是為了加快速度，避免一開始載入 MathJax 花太久時間 ...

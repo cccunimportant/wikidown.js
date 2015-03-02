@@ -1,33 +1,19 @@
-### 關於少年科技人雜誌
 
-[少年科技人雜誌] 與 [程式人雜誌] 都是結合「開放原始碼與公益捐款活動」的雜誌，簡稱「開放公益雜誌」。開放公益雜誌本著「讀書做善事、寫書做公益」的精神，我們非常歡迎大家認養專欄、或者捐出您的網誌。
+| 出刊年月 |  wikidown | html | epub | pdf | 焦點主題 |
+|-------------|---------------|-------|-------|------|-------------|
+| [2015年2月號](db/ymag201502/book/index.html) |  [wikidown](../../ymag201502/htm/home.html) |  [html](db/ymag201502/book/book.html) |  [epub](db/ymag201502/book/book.epub) | [pdf](db/ymag201502/book/book.pdf) | 開放原始碼的世界  |
 
-### 本期內容
 * 前言
-    * [[編輯小語]](editor)
-    * [[授權聲明]](license)
+    * [編輯小語](../htm/editor.html)
+    * [授權聲明](../htm/license.html)
 * 本期焦點： 開放原始碼的世界
-<!--    * [[開放原始碼的歷史]](focus1) -->
-    * [[開放原始碼授權]](focus2)
-    * [[進入開放原始碼領域的方法]](focus3)
+    * [開放原始碼授權](../htm/focus2.html)
+    * [進入開放原始碼領域的方法](../htm/focus3.html)
 * 科技人物
-    * [[開源之父 -- Richard Stallman]](people1)
-    * [[開源大師 -- Linus Torvalds]](people2) <!--    * [[創作共用授權創始人 -- Lourence Lessig]](people3) -->
-    * [[Markdown 與 RSS 的創造者 -- Aaron Swartz]](people4)
+    * [開源之父 -- Richard Stallman](../htm/people1.html)
+    * [開源大師 -- Linus Torvalds](../htm/people2.html)
+    * [Markdown 與 RSS 的創造者 -- Aaron Swartz](../htm/people4.html)
 * 程式人文集
-    * [[我的開放原始碼之路 -- (作者：陳鍾誠)]](article1)
-* [[雜誌訊息]](info)
+    * [我的開放原始碼之路 -- (作者：陳鍾誠)](../htm/article1.html)
+* [雜誌訊息](../htm/info.html)
 
-
-### 雜誌取得
-
-目前 [少年科技人雜誌] 與 [程式人雜誌] 兩者會交替出刊， [程式人雜誌] 會在奇數月 (1,3,5,7,9,11月) 出刊， [少年科技人雜誌] 會在偶數月 (2,4,6,8,10,12月) 出刊，您可以從下列網址取得程式人雜誌的所有內容。
-
-* 程式人雜誌 -- <http://ccckmit.github.io/wikidown.js/web/wikidown.html#pmag:home>
-* 少年科技人雜誌 -- <http://ccckmit.github.io/wikidown.js/web/wikidown.html#ymag:home>
-
-### 連絡我們
-
-竭誠歡迎程式人投稿，或者成為本雜誌的專欄作家，現在就可以加入 [程式人雜誌社團] 一同共襄盛舉。
-
-本雜誌編輯為「陳鍾誠 (@ccckmit)」，若要聯絡編輯，請寄信到 <ccckmit@gmail.com>。

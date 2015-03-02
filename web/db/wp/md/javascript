@@ -173,7 +173,7 @@ document.write("o['x']="+o['x']+" y="+o.y+" sum()="+o.sum());
 
 執行結果
 
-![[]](jsObjectOutput.jpg)
+![](../img/jsObjectOutput.jpg)
 
 ### JavaScript 物件的繼承
 
@@ -219,7 +219,7 @@ document.write("tony.toStr()="+tony.toStr()+"<BR/>");
 
 執行結果
 
-![[]](jsInheritanceOutput.jpg)
+![](../img/jsInheritanceOutput.jpg)
 
 ### JavaScript 物件的多型
 
@@ -266,7 +266,7 @@ for (i in array)
 
 執行結果
 
-![[]](jsPolymorphismOutput.jpg)
+![](../img/jsPolymorphismOutput.jpg)
 
 
 ### JavaScript 物件的精簡表示法 -- JSON 物件資料交換格式
@@ -317,7 +317,7 @@ document.write("</ol>");
 
 執行結果
 
-![[]](jsJsonOutput.jpg)
+![](../img/jsJsonOutput.jpg)
 
 以上我們簡單的介紹了 JavaScript 的物件導向功能，這種物件導向的實作方式由於是以原型為核心的，因此筆者喜歡稱 JavaScript 為原型導向 (prototype oriented) 的語言，雖然並不是很多人使用「原型導向」這個用法。
 

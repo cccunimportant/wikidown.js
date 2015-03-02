@@ -1,3 +1,5 @@
+#titleHead * { color:#999999; font-weight:bold; text-decoration:none; }
+#titleHead a:hover { color:#bbbbbb; text-decoration:none; }
 .innerLink { color:#996633; }
 
 ruby {

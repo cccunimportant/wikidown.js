@@ -50,7 +50,7 @@ app.post("/db/:db/:name", function(req, res) {
   var db = req.params.db;
   var name = req.params.name;
   var obj = req.body.obj;
-  fs.writeFile(dbRoot+"/"+db+"/md/"+name, obj, function(err) {
+  fs.writeFile(dbRoot+"/"+db+"/wd/"+name, obj, function(err) {
     if (err)
       response(res, 500, 'write fail!');
     else
