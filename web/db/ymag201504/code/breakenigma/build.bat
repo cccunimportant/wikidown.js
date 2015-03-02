@@ -1,0 +1,1 @@
+gcc break_enigma2.c enigma2.c NBestList2.c scoreText2.c -lm -O3

@@ -1,0 +1,223 @@
+# 使用 node.js 設計 wikidown 網誌系統
+
+## 簡介
+
+Wikidown 採取單頁應用 (Single Page Application) 的設計模式，而且將前端應用完全放在單一的 html 網頁內。
+
+透過這種設計方式，即使伺服端沒有啟動，我們仍然可以透過一般伺服器正常呈現那些已經編寫好的 markdown 文件。
+
+因此我們可以將 wikidown 專案上傳到 dropbox 或 github pages 上面，仍然可以正常運作，只是無法存檔而已。
+
+舉例而言、wikidown 在 github pages 上的首頁為 <http://ccckmit.github.io/wikidown1/public/wikidown.html> ，您點選後就可以看到 wikidown.html 以單純網頁 (無 wikiServer 伺服器) 的形式在執行的情況。在這種情況下，我們可以檢視那些已經寫好的 markdown 文件，而 wikidown.html 會透過 jQuery.ajax() 函數向一般性的網頁伺服器請求取得 markdown 文件後，利用 showdown 這個開放原始碼專案將 markdown 文件轉換成 html 並顯示在畫面上。
+
+但是如果我們用 node wikiServer 指令啟動本機伺服端，就可以訪問 `http://localhost:3000/` 以檢視 wikidown 系統，並且可以進行存檔，檔案的網址在 `db/md/<filename>` 這樣的路徑底下，您可以利用 wikidown 來編輯出整個維基網站。
+
+不過在第一版的  wikidown 系統中，我們並沒有提供「認證與登入登出」的帳戶功能，因此任何人都可以進來編輯。所以第一版比較適合用來安裝在自己的電腦撰寫個人的維基型網誌，但是不適合用來架站給很多使用者使用。
+
+以下分別列出 wikidown 的程式原始碼，提供給讀者參考！
+
+## 原始碼: client 端
+
+檔案: public/wikidown.html
+
+```html
+<html>
+<head>
+<meta charset="utf-8" />
+  <link rel="icon" href="favicon.ico">
+  <link href="css/bootstrap.min.css" rel="stylesheet">
+  <link href="main.css" rel="stylesheet">
+</head>
+<body onload="load()">
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <div class="navbar-header">
+          <a class="navbar-brand" href="#main" style="color:#cccc33"><span class="glyphicon glyphicon-home"></span></a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <form class="navbar-form navbar-right">
+            <div class="form-group">
+              <input id="filename" type="text" class="form-control" placeholder="filename" aria-describedby="basic-addon1" value="main">
+			  <button class="btn btn-success" type="button" onclick="loadFile()">檢視</button>
+              <button class="btn btn-success" type="button" onclick="editFile()">編輯</button>
+              <button class="btn btn-success" type="button" onclick="saveFile()">儲存</button> 
+			</div>
+          </form>
+        </div>
+      </div>
+    </nav>
+
+    <div id="showPanel" class="tab-pane panel">
+      <div id="htmlBox" class="container"></div>
+    </div>
+    <center>
+      <div id="editPanel" class="tab-pane panel" style="width:90%; height:90%;">
+        <br/>
+        <textarea id="mdBox" class="form-control" style="width:100%; height:100%"></textarea>
+      </div>
+    </center>
+
+<script>
+DB = { 
+  db:"md",
+}
+
+DB.save=function(name, doc) {
+  $.ajax({
+    type: "POST",
+    url: "../db/"+DB.db+"/"+name,
+    data: { obj: doc },
+  })
+  .done(function(data) {
+    alert( "存檔完成!");
+  })
+  .fail(function() {
+    alert( "存檔前請先登入！" );
+  });
+}
+
+DB.load=function(name) {
+  return $.ajax({
+    type: "GET",
+    url: "../db/"+DB.db+"/"+name,
+    data: {}
+  });
+}
+
+var filename, converter;
+function load() {
+  converter = new Showdown.converter({ extensions: ['table'] });
+  if (window.location.hash === '')
+    filename = $('#filename').val();
+  else
+    filename = window.location.hash.substring(1);
+  showFile(filename);
+}
+
+function mdToHtml(md) {
+  md  = md.replace(/\[\[(.+?)\]\]\((.*?)\)/gi, '<a href="#$2" class="innerLink">$1</a>');
+  md  = md.replace(/\[\[(.+?)\]\]/gi, '<a href="#$1" class="innerLink">$1</a>');
+  return converter.makeHtml(md);
+}
+
+function show(md) {
+  $('#mdBox').val(md);
+  var html = mdToHtml(md);
+  $('#htmlBox').html(html);
+  switchPanel('showPanel');
+}
+
+var mdNewFile = '# 標題：文件不存在\n\n您可以編輯後存檔！\n## 語法\n* [[內部連結]](innerLink)\n* [外部連結](link)';
+
+function showFile(filename) {
+  if (filename === null || filename === '')
+    return;
+  $('#filename').val(filename);
+  window.location.hash = '#'+filename;
+  DB.load(filename)
+  .done(show)
+  .fail(function() {
+    show(mdNewFile);
+  });
+}
+
+function switchPanel(name) {
+  $('.panel').css( "display", "none");
+  $('#'+name).css( "display", "block");
+}
+
+function loadFile() {
+  filename = $('#filename').val();
+  showFile(filename);
+  switchPanel('showPanel');
+}
+
+function editFile() {
+  switchPanel('editPanel');
+}
+
+function saveFile() {
+  var md = $('#mdBox').val();
+  DB.save(filename, md);
+}
+
+window.onhashchange = function () {
+  filename = window.location.hash.substring(1);
+  showFile(filename);
+}
+
+window.onbeforeunload = function(){}
+</script>
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/Showdown.min.js"></script>
+    <script src="js/Showdown_table.min.js"></script>
+</body>
+</html>
+```
+
+## 原始碼: server 端
+
+```javascript
+var c = console;
+var fs = require('fs');
+var express = require('express');
+var path = require('path');
+var bodyParser = require("body-parser"); // 參考：http://codeforgeek.com/2014/09/handle-get-post-request-express-4/
+var cookieParser = require('cookie-parser')
+var session = require('express-session');
+var serveIndex = require('serve-index');
+
+var app = express();
+var pubDir = path.join(__dirname, 'public');
+var dbDir  = path.join(__dirname, 'db');
+
+app.use(cookieParser());
+app.use(session({secret: '@#$TYHaadfa1', resave: false, saveUninitialized: true}));
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use('/public/', express.static(pubDir));
+app.use('/public/', serveIndex(pubDir, {'icons': true}));
+
+function response(res, code, msg) {
+  res.set('Content-Type', 'text/plain').status(code).send(msg).end();
+  c.log("=====response=====\n"+code+":"+msg);
+}
+
+app.get("/", function(req, res) {
+  res.redirect('/public/wikidown.html');
+});
+
+app.get("/db/:db/:name", function(req, res) {
+  var db = req.params.db;
+  var name = req.params.name;
+  fs.readFile(dbDir+'/'+db+'/'+name, function(err, jtext) {
+    if (err)
+      response(res, 404, 'read fail!');
+    else
+      response(res, 200, jtext.toString());
+  });
+});
+
+app.post("/db/:db/:name", function(req, res) {
+  var db = req.params.db;
+  var name = req.params.name;
+  var obj = req.body.obj;
+  var msg = "db:"+db+" name:"+name+"\n"+obj;
+  fs.writeFile(dbDir+"/"+db+"/"+name, obj, function(err) {
+    if (err)
+      response(res, 500, 'write fail!');
+    else
+      response(res, 200, 'write success!');
+  })
+});
+
+app.listen(3000);
+
+console.log('Server started: http://localhost:3000/');
+```
