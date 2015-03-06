@@ -191,11 +191,11 @@
 
 function wdToHtml(wd) {
   wd  = '\n'+wd+' ';
-  wd  = wd.replace(/(\s)\!\[\[([^\]]*?)\]\]\((.*?)\)/gi, '$1<div class="figure"><img src="/db/'+path().domain+'/$3"/><p class="caption">$2</p></div>'); // 內部圖片 ![[text]](file)
-  wd  = wd.replace(/(\s)\[\[([^\]]+?)\]\]\(([^:\)]+):([^:\)]+)\)/gi, '$1<a href="/web/wikidown.html#$3:$4" class="innerLink">$2</a>'); // 內部連結 [[text]](domain:file)
-  wd  = wd.replace(/(\s)\[\[([^\]]+?)\]\]\((.*?)\)/gi, '$1<a href="/web/wikidown.html#'+path().domain+':$3" class="innerLink">$2</a>'); // 內部連結 [[text]](file)
-  wd  = wd.replace(/(\s)\[\[([^\]:]+):([^\]:]+)\]\]/gi, '$1<a href="/web/wikidown.html#$2:$3" class="innerLink">$2:$3</a>'); // 內部連結 [[file]]
-  wd  = wd.replace(/(\s)\[\[([^\]:]+?)\]\]/gi, '$1<a href="/web/wikidown.html#'+path().domain+':$2" class="innerLink">$2</a>'); // 內部連結 [[file]]
+  wd  = wd.replace(/(\s)\!\[\[([^\]]*?)\]\]\((.*?)\)/gi, '$1<div class="figure"><img src="../db/'+path().domain+'/$3"/><p class="caption">$2</p></div>'); // 內部圖片 ![[text]](file)
+  wd  = wd.replace(/(\s)\[\[([^\]]+?)\]\]\(([^:\)]+):([^:\)]+)\)/gi, '$1<a href="#$3:$4" class="innerLink">$2</a>'); // 內部連結 [[text]](domain:file)
+  wd  = wd.replace(/(\s)\[\[([^\]]+?)\]\]\((.*?)\)/gi, '$1<a href="#'+path().domain+':$3" class="innerLink">$2</a>'); // 內部連結 [[text]](file)
+  wd  = wd.replace(/(\s)\[\[([^\]:]+):([^\]:]+)\]\]/gi, '$1<a href="#$2:$3" class="innerLink">$2:$3</a>'); // 內部連結 [[file]]
+  wd  = wd.replace(/(\s)\[\[([^\]:]+?)\]\]/gi, '$1<a href="#'+path().domain+':$2" class="innerLink">$2</a>'); // 內部連結 [[file]]
   wd  = wd.replace(/(\s)\$([^$\n]+?)\$/gi, '$1<script type="math/tex">$2</'+'script>');// 數學式 $$[latex]$$,  刻意把 '</'+'script>' 分開，避免瀏覽器認為是真的 script 區塊
   return md2html(wd);
 }
