@@ -1,0 +1,86 @@
+## Wikidown 的語法與使用方式
+
+Wikidown 是一個結合 wiki 與 markdown 兩種概念的系統，利用類似維基百科的  wiki 組織功能，但是卻將 wiki 語法改為 markdown 語言來撰寫，這兩個概念的結合形成了 wikidown 系統的骨幹。
+
+您可以從下列的 wikidown 編輯畫面看出編輯框中採用的是 markdown 的語法，markdown 語法的特色是，就算在原始碼階段也很容易看清楚呈現後的樣子，因為 markdown 的設計哲學就是讓文字檔也有「所視即所得」的感覺，因此也非常容易記憶、撰寫和感受。
+
+![[圖、wikidown 的編輯畫面]](wikidown_edit.jpg)
+
+如果您按下預覽按鈕，上圖的編輯內容就會被 wikidown 轉換成 HTML 後顯示出來，您可以看到那些簡易的 markdown 文字內容被轉換成『具有超連結與排版的 HTML網頁，如下圖所示：
+
+![[圖、wikidown 的顯示畫面]](wikidown_view.jpg)
+
+除了一般性的網頁排版、圖片之外，wikidown 也支援了一些在 markdown 標準規格上未定義，但是卻常被用來延伸 markdown 功能的語法，像是表格與數學式等等。
+
+舉例而言、本期的雜誌我們就是採用 wikidown 編輯的，以下就是這些 markdown 延伸語法的一些範例
+
+### 內部連結
+
+在 markdown 中的連結語法為 `[顯示文字](url)` ，因此若您想引用像 yahoo 這樣一個外部連結，就可以用 `[Yahoo](http://www.yahoo.com/)` ，但是如果您想引用內部的連結，則可以採用相對路徑的方式，例如：`[說明](help.html)` 這樣的語法就可以引用同一層次的網頁。
+
+但是在 wikidown 系統中，所有的 markdown 檔案都被直接以文字檔的方式儲存在 `web/db/<domain>/<file>` 這樣的路徑下，直接引用這些檔案的話，所呈現的將會是 markdown 語法的文字檔，而無法以網頁的方式呈現。
+
+若要以網頁的方式呈現，必須透過 `wikidown.html#<domain>:<file>` 或 `#<domain>:<file>` 這樣的網址去顯示，所以我們可以用 `[程式人雜誌2015年3月號](#pmag201503:home)` 來連結到本期雜誌的首頁。
+
+但是這種方法還是要加上 `<domain>` 欄位 ，還不夠方便，於是我們設計了一種擴充性的語法，其中  `[[顯示文字]](file)` 直接用來連結內部的 markdown 檔案，所以如果您正在編輯 `pmag201503:focus1` 這個檔案，就可以用 `[[程式人雜誌2015年3月號]](home)` 的語法連結到該同一 `<domain>` 的 home 檔案，而不需要明確的指定 `<domain>` 了，這種語法稱為內部連結。
+
+您除了可以用 `[[顯示文字]](file)` 這樣的語法引用同一 domain 的連結之外，也可以用 `[[file]]` 這樣更精簡的語法直接引用，或者用 `[[顯示文字]](domain:file)` 與 `[[domain:file]]` 這樣的語法引用其他 domain 的連結。
+
+### 表格語法
+
+![[]](table.jpg)
+
+呈現結果如下
+
+----
+
+[[程式人雜誌]](pmag:home)
+
+| 出刊年月 | 焦點主題 |
+|------|------|
+| [[2015年1月號]](home) |  [wikidown.js](https://github.com/ccckmit/wikidown.js) 維基網誌系統 -- 躍上雲端記  |
+
+----
+
+### 數學式
+
+接著來看看數學式的範例，如果我們輸入下列  latex 語法
+
+`$\int_{0}^{\infty} f(x)$` 
+
+那麼 wikidown 會呼叫 MathJax 這個開源 javascript 套件將數學式轉換為下列呈現結果。
+
+$\int_{0}^{\infty} f(x)$
+
+### 內部圖片
+
+內部圖片的語法為 `![[圖片說明]](filename)` ，例如在 `pmag201503:focus1` 這個檔案內編輯輸入  `![[姓名標示、相同方式分享]](cc_by_sa.jpg)` 的語法，該語法會被 wikidown 轉換為下列的 HTML 語法。
+
+```
+<div class="figure">
+  <img src="db/pmag201503/img/cc_by_sa.jpg"/>
+  <p class="caption">姓名標示、相同方式分享</p>
+</div>
+```
+
+於是您只要將圖片放在對應的 img 資料夾底下，就能正確的顯示這些圖片了，以下是上述 `![[姓名標示、相同方式分享]](cc_by_sa.jpg)` 的顯示結果。
+
+![[姓名標示、相同方式分享]](cc_by_sa.jpg)
+
+
+以下是筆者將 wikidown.js 系統安裝在自己的電腦中使用的教學錄影，對於想安裝這個系統使用的人而言，應該會很有幫助。
+
+* [YouTube影片：wikidown.js = wiki + markdown + node.js -- 安裝與使用](http://youtu.be/TCd8OTGbwmc)
+
+
+### 結語
+
+透過這樣的延伸語法， wikidown 彌補了 markdown 被用在維基系統上的一些不足之處，於是我們站在 markdown 的基礎上，建立的 wikidown.js  這樣一個支援 markdown 擴充語法的維基型網誌系統。
+
+而您現在所看到位於 的網頁，很可能就是我們用 wikidown 所編輯的版本，並且正透過 wikidown 系統誠現在您的面前阿！
+
+
+
+
+
+

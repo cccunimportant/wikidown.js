@@ -1,9 +1,0 @@
-| 章節 | 標題  |  說明  |
-|----|--------|-----------|
-| 第 1 章 | [[用 Node.js 學 JavaScript 語言]](basic)  |    |
-| 第 2 章 |  [[JavaScript 的流程控制]](control)  |    |
-| 第 3 章 |  [[JavaScript 的函數、參數與閉包]](function)  |    |
-| 第 4 章 |  [[JavaScript 的物件與 JSON]](object)  |    |
-| 第 5 章 |  [[JavaScript 的原型機制 （prototype)]](prototype)  |    |
-| 第 6 章 |  [[JavaScript 的模組與套件（module)]](module)  |    |
-| 第 7 章 |  [[ECMA Script 6 的新語法]](module)  |  yield,  繼承, 預設值, ... |

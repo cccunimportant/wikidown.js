@@ -1,0 +1,48 @@
+<html><head><meta charset="utf-8"><link href="../static.css" rel="stylesheet"><title>HTML = $(patsubst %.wd,%.html,$(wildcard *.wd))</title><base href="../"></head><body><div id="header_wrap"><h1><p><a href="pmag/home.html">程式人雜誌</a>  / <a href="pmag201503/home.html">2015年3月號</a> </p></h1></div><div id="content"><p>HTML = $(patsubst %.wd,%.html,$(wildcard *.wd))
+WD     = title.wd preface.wd editor.wd license.wd focus.wd focus2.wd focus3.wd focus4.wd article.wd article1.wd article2.wd article3.wd info.wd reflink.wd
+HARG =  --data-dir=../ -c epub.css -B header.htm -A footer.htm --toc --base-header-level=1 --toc-depth=2</p>
+
+<p>.PHONY: all</p>
+
+<p>all: init htm shtm epub pdf end</p>
+
+<p>init:
+    echo $(HTML)</p>
+
+<p>end:</p>
+
+<p>shtm: init
+    pandoc $(WD) $(HARG) -o book.html</p>
+
+<p>epub: init
+    pandoc --data-dir=../ $(WD) --toc --base-header-level=1 --toc-depth=2 --epub-metadata=epub.meta --epub-stylesheet=epub.css --epub-cover-image=cover.jpg -o book.epub</p>
+
+<p>pdf: epub
+    ebook-convert book.epub book.pdf --margin-top=16 --margin-bottom=16 --margin-left=20 --margin-right=20 --pretty-print --base-font-size=11 --font-size-mapping="10, 12, 14, 16, 20, 24, 28, 36" --output-profile=ipad3   </p>
+
+<p>htm: init $(HTML)</p>
+
+<p>%.html: %.wd
+    pandoc $(HARG) $* reflink.md -o $@</p>
+
+<p>clean: </p>
+
+<h1 id="md0">%.md0 :</h1>
+
+<h1 id="nodemd0jsdmd0dmd">node md0.js $<em>.md0 $</em>.md</h1>
+
+<h1 id="md0dmd0">md0: $(MD0)</h1>
+
+<h1 id="dgnwqsdependenciescnodependenciesatargetssc">$?�G�N���w�Q���s�� dependencies ���ȡC�]�N�O dependencies ���A�� targets �ٷs���ȡC</h1>
+
+<h1 id="dgntargetsc">$@�G�N�� targets ���ȡC</h1>
+
+<h1 id="dgndependenciesc">$&lt;�G�N���Ĥ@�� dependencies ���ȡC</h1>
+
+<h1 id="dntargetswatwc">$* : �N�� targets �ҫ��w���ɮסA�����]�t���ɦW�C</h1>
+
+<p>%wd%</p>
+
+<hr />
+
+<p><center style="font-size:small;color:#888888">本雜誌部份內容修改自 <a href="http://zh.wikipedia.org/">維基百科</a> ， 使用時請遵守 <a href="http://creativecommons.org/licenses/by-sa/3.0/tw/">姓名標示、相同方式分享</a> 授權。<br/> 雜誌編輯：  <a href="#ccc:home">陳鍾誠</a>  email: <a href="&#x6d;&#97;&#105;&#108;&#116;&#111;:&#99;&#99;c&#x6b;m&#105;&#116;&#64;&#x67;&#109;&#x61;&#105;&#x6c;&#x2e;&#x63;&#111;&#x6d;">&#99;&#99;c&#x6b;m&#105;&#116;&#64;&#x67;&#109;&#x61;&#105;&#x6c;&#x2e;&#x63;&#111;&#x6d;</a> </center></p></div></body></html>

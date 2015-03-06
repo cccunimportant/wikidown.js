@@ -11,7 +11,7 @@ function writeFile(path, text) {
 	  var partPath = parts.slice(0, i).join('/');
 	  try {
         fs.mkdirSync(partPath);
-	  } catch(e) {
+	catch  } catch(e) {
         if ( e.code != 'EEXIST' ) throw e;
       }
     }
@@ -22,19 +22,26 @@ function replace(str, source, target) {
   return str.split(source).join(target);
 }
 
-function wd2md(wd) {
-  var md  = wd.replace(/(\s)\!\[\[([^\]]*?)\]\]\((.*?)\)/gi, '$1![$2](../img/$3)')
-			  .replace(/(\s)\[\[([^\]]+?)\]\]\(([^:\)]+):([^:\)]+)\)/gi,  '$1[$2](../../$3/htm/$4.html)')
-			  .replace(/(\s)\[\[([^\]]+?)\]\]\((.*?)\)/gi, '$1[$2](../htm/$3.html)')
-			  .replace(/(\s)\[\[([^\]:]+?)\]\]/gi, '$1[$2](../htm/$2.html)')
+function wd2md(wd, domain) {
+  var md  = wd.replace(/(\s)\!\[\[([^\]]*?)\]\]\((.*?)\)/gi, '$1![$2]('+domain+'/img/$3)')
+			  .replace(/(\s)\[\[([^\]]+?)\]\]\(([^:\)]+):([^:\)]+)\)/gi,  '$1[$2]($3/htm/$4.html)')
+			  .replace(/(\s)\[\[([^\]]+?)\]\]\((.*?)\)/gi, '$1[$2]('+domain+'/htm/$3.html)')
+			  .replace(/(\s)\[\[([^\]:]+?)\]\]/gi, '$1[$2]('+domain+'/htm/$2.html)')
 			  .replace(/(\s)\$\$([^$]+?)\$\$/gi, '$1$[$2]$')
 			  ;
   return md;
 }
 
-function wd2html(wd) {
-  var md  = wd2md(wd);
+function wd2html(wd, domain) {
+  var md  = wd2md(wd, domain);
   return converter.makeHtml(md);
+}
+
+function bookTemplate(domain) {
+  var templateHead = config.template['wikidown'];
+  if (config.template[domain] !== undefined)
+    templateHead = config.template[domain];
+  return templateHead;
 }
 
 function bookTitleHtml(domain) {
@@ -42,7 +49,7 @@ function bookTitleHtml(domain) {
   if (title[domain] !== undefined)
     titleHead = title[domain];
   c.log(titleHead);
-  return wd2html(titleHead);
+  return wd2html(titleHead, domain);
 }
 
 function processWd(wdPath, template) {
@@ -51,9 +58,9 @@ function processWd(wdPath, template) {
   var mdPath = wdPath.replace('/wd/', '/md/');
   var htmPath = wdPath.replace('/wd/', '/htm/')+'.html';
   var wd = fs.readFileSync(wdPath, 'utf8');
-  var md  = wd2md(wd);
+  var md  = wd2md(wd, domain);
   writeFile(mdPath, md);
-  var wdHtml = converter.makeHtml(md);
+  var wdHtml = converter.makeHtml(md+'\n'+bookTemplate(domain));
   var html = replace(template, '?wdHtml?', wdHtml);
   html = replace(html, '?bookTitle?', bookTitleHtml(domain));
   var titleMatch = wd.match(/([^#\n]{1,100})/);
@@ -67,15 +74,15 @@ function processWd(wdPath, template) {
 
 // c.log(config);
 
-var template = '<html><head><meta charset="utf-8"><link href="../../../static.css" rel="stylesheet"><title>?pageTitle?</title></head><body><div id="header_wrap"><h1>?bookTitle?</h1></div><div id="content">?wdHtml?</div></body></html>';
+var template = '<html><head><meta charset="utf-8"><link href="../../static.css" rel="stylesheet"><title>?pageTitle?</title><base href="../../"></head><body><div id="header_wrap"><h1>?bookTitle?</h1></div><div id="content">?wdHtml?</div></body></html>';
 
 var dir;
 
 if (process.argv.length > 2) {
   var domain = process.argv[2];
-  dir = 'web/db/'+domain+'/wd';
+  dir = 'db/'+domain+'/wd';
 } else
-  dir = 'web/db';
+  dir = 'db';
 
 var title = config.title;
 var walker  = walk.walk(dir, { followLinks: true });

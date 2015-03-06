@@ -1,0 +1,351 @@
+<html><head><meta charset="utf-8"><link href="../static.css" rel="stylesheet"><title> Node.js -- 表單資料的處理</title></head><body><div id="header_wrap"><h1><p><a href="../ccc/home.html">陳鍾誠</a>  / <a href="../book/home.html">教科書</a>  / <a href="../wp/home.html">Web程式設計</a> </p></h1></div><div id="content"><h1 id="nodejs">Node.js -- 表單資料的處理</h1>
+
+<h2 id="web">Web 的表單資料</h2>
+
+<p>在「HTML 網頁設計」這個章節裏，我們曾經介紹過 form 這個標記的用法，以及包含於其中的一群表單標記，讓我們再次複習一下這個主題。</p>
+
+<p>在 HTML 當中，表單 (Form) 是指可以讓使用者進行輸入的元件，其語法是用 <code>&lt;form&gt; ...&lt;/form&gt;</code> 夾住一堆的輸入元件，這些輸入元件包含 input (輸入)、 textarea (文字區)、 select (選項) 等，其中的 input 還可以根據其 type 欄位顯示成 checkbox, color, date, datetime, datetime-local, email, file, hidden, image, month, number, password, radio, range, reset, search, submit, tel, text, time, url, week 等各種不同的輸入欄形式，以下是一個表單的範例。</p>
+
+<pre><code class="html">&lt;form action="signup" method="post"&gt;
+帳號: &lt;input type="text" name="user"/&gt;&lt;br/&gt;
+密碼: &lt;input type="password" name="password"/&gt;&lt;br/&gt;
+信箱: &lt;input type="email" name="email"/&gt;&lt;br/&gt;
+生日: &lt;input type="date" name="birthday"/&gt;&lt;br/&gt;
+照片: &lt;input type="file" name="picture"/&gt;&lt;br/&gt;
+性別: &lt;input type="radio" name="sex" value="male" checked/&gt; 男
+      &lt;input type="radio" name="sex" value="female"/&gt; 女&lt;br/&gt;
+血型: &lt;select name="BloodType"&gt;
+        &lt;option value="A"&gt;A 型&lt;/option&gt;
+        &lt;option value="B"&gt;B 型&lt;/option&gt;
+        &lt;option value="AB"&gt;AB 型&lt;/option&gt;
+        &lt;option value="O"&gt;O 型&lt;/option&gt;
+      &lt;/select&gt; &lt;br/&gt;
+自我介紹： &lt;br/&gt;
+&lt;textarea name="AboutMe"&gt;
+&lt;/textarea&gt; &lt;br/&gt;
+
+&lt;input type="submit" value="送出"/&gt;&lt;input type="reset" value="清除"/&gt;&lt;br/&gt;
+&lt;/form&gt;
+</code></pre>
+
+<p>檢視檔案：<a href="https://dl.dropbox.com/u/101584453/web/wp/code/form.htm">https://dl.dropbox.com/u/101584453/web/wp/code/form.htm</a></p>
+
+<p><img src="form.jpg" alt="表單的顯示結果" title="" /></p>
+
+<p>在上述的範例中，當 submit 類型的送出鈕被按下後，瀏覽器會將這些填寫的資訊，以先前所說的 GET/POST 方式，發送給伺服器，如果 method 欄位是 GET，那麼會採用在 HTTP 表頭網址處傳送 singup?user=xxx&amp;password=xxx .....這樣的形式送出，這種方式會將密碼顯示在瀏覽器的網址列上，比較容易被看到，若 method 欄位是 POST，則會在 HTTP 表頭尾端加上 user=xxx&amp;password=xxx ... 的資訊，不會在網址列上被看到。當然、如果有人監控網路上訊息的話，還是會看得到這些輸入資訊。</p>
+
+<p>若要更安全，則必須採用 HTTPS 的 SSL 方式傳遞，這種方式會對訊息加密編碼，就比較不會有輸入訊息外洩的危險。</p>
+
+<p>node.js 對於 GET/POST 訊息的處理，是以 url 與 querystring 為基礎，然後還有個額外的套件 express 可以進行方便的進階處理，以下我們將介紹這些主題。</p>
+
+<h2 id="get">GET 的處理</h2>
+
+<p>node.js 在處理 GET 表單訊息時，最基礎的方式是使用 url.parse() 與 querystring.parse() 等兩個函數為基礎的，以下是一個簡單的範例。</p>
+
+<p>檔案：httpget.js</p>
+
+<pre><code class="javascript">http = require('http');
+qs = require('querystring');
+url = require('url');
+util = require('util');
+
+format = function() {
+    return util.format.apply(null, arguments);
+};
+
+log = console.log;
+ip   = "127.0.0.1";
+port = 8080;
+
+server = http.createServer(function (req, res) {
+  var path = url.parse(req.url),
+      parameter = qs.parse(path.query);
+
+  res.writeHead(200, {'Content-Type': 'text/plain'});
+  res.write(format("path=%j\n", path));
+  res.write(format("parameter=%j\n", parameter));
+  res.end();
+});
+
+server.listen(port, ip);
+
+console.log(format("Server running at http://%s:%d\n", ip, port));
+</code></pre>
+
+<p>執行結果：</p>
+
+<pre><code>D:\Dropbox\Public\wp\code&gt;node httpget
+Server running at http://127.0.0.1:8080
+</code></pre>
+
+<p><img src="http_get.jpg" alt="" title="" /></p>
+
+<p>由於 GET 的傳送方式是透過網址欄，因此您只要在網址上進行修改，就可以看到上述程式會有不同的執行結果。</p>
+
+<h2 id="post">POST 的處理</h2>
+
+<p>對於 POST 訊息而言，就無法透過修改網址的方式測試了，要示範如何用 node.js 處理 post 訊息，我們必須先有一個
+包含表單的 HTML 網頁，然後在 form 欄位內指定 <code>method="POST"</code> ，這樣當您填完按下 submit 送出鈕時，網頁中所
+填寫的資訊就會附加在 HTTP 表頭的尾部傳送出去。</p>
+
+<p>檔案：httppost.htm</p>
+
+<pre><code class="html">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;meta charset="utf-8" /&gt;
+&lt;/head&gt;
+  &lt;body&gt; 
+    &lt;form id="signup" method="POST" action="http://localhost:8080/post"&gt;
+      &lt;label&gt;帳號：&lt;/label&gt;&lt;input type="text" id="user" name="user" value="ccc"/&gt;&lt;br/&gt;
+      &lt;label&gt;密碼：&lt;/label&gt;&lt;input type="text" id="password" name="password" value="1234567"/&gt;&lt;br/&gt;
+      &lt;label&gt;標題：&lt;/label&gt;&lt;input type="text" id="title" name="title" size="80" value="當您死後，您在意的是公墓裏的那塊牌子，還是 facebook 上的日誌與照片呢？"/&gt;&lt;br&gt;
+      &lt;textarea name="text" rows=30 cols=80&gt;
+如果我死了！我不會在意自己被葬在哪裡，公墓裏有沒有一個骨灰罈或牌子！
+
+但是我會在意自己的「照片、錄影、網誌、facebook、YouTube上的影片、電子書、以及我所創辦的程式人雜誌」是否有人接手、整理或出版。
+
+我不希望死後 facebook 上的資訊就被視為靜止戶而刪除，我不希望網誌上的資訊雜亂無章，我不希望數位相機的照片與錄影從此消失，我不希望那些美好的記憶在家人的腦海裡逐漸模糊！
+
+我希望這些資訊可以變成我的日記、著作，有人幫我剪接這些影片，在喪禮上可以回顧我的一生，我希望我的小孩有空時能透過這些資訊瞭解我，甚至是與已經身在天堂的我對話，當他有的生命遇到疑問時，可以從我的人生經驗當中得到啟發，或者些許的指引與安慰！
+
+如果我的老婆小孩經濟困難，我希望可以從我的數位遺產中找到有價值出版的作品，幫助他們度過難關，如果他們的經濟情況不錯，我希望這些價值就捐獻給公益團體。
+
+要完成這些事，就必須要有一個組織，提供「數位遺產管理」的服務。這需要有一些工具可以擷取出這些數位遺產，需要一些人力可以幫組織與整理，並且需要服務人員對家屬提供適當的協助。所以我想，這需要一整個公司，甚至整個供應鏈的配合。
+
+這是一個全新的領域 -- 「數位殯葬業 + 數位遺產管理事業」，當您抱怨網路行業都已經被 Google 、Facebook 、淘寶等公司壟斷的時候，實體的世界當中仍然有很多的創業機會，等著您去開發！
+      &lt;/textarea&gt;&lt;br/&gt;
+      &lt;input type="submit" value="送出" /&gt;
+    &lt;/form&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+<p><img src="httppost_htm.jpg" alt="" title="" /></p>
+
+<p>接著、我們就可以用請求參數 req 的 <code>on("data", ...)</code> 事件與接收資料，然後在 <code>on("end", ...)</code> 事件
+時完成接收並處理 POST 訊息，如以下程式所示。</p>
+
+<p>檔案：httppost.js</p>
+
+<pre><code class="javascript">http = require('http');
+qs = require('querystring');
+url = require('url');
+util = require('util');
+
+format = function() {
+    return util.format.apply(null, arguments);
+};
+
+log = console.log;
+ip   = "127.0.0.1";
+port = 8080;
+
+server = http.createServer(function (req, res) {
+  var path = url.parse(req.url, true),
+      parameter = qs.parse(path.query);
+
+  res.writeHead(200, {'Content-Type': 'text/plain'});
+  formData = '';
+  req.on("data", function(data) {
+    return formData += data;
+  });
+  req.on("end", function() {
+    res.writeHead(200, {"Content-Type":"text/html; charset=utf-8"});
+    post = qs.parse(formData);
+    log(format("post=%j\n", post));
+    user = post.user;
+    password = post.password;
+    title = decodeURIComponent(post.title);
+    text  = decodeURIComponent(post.text);
+    res.write("user="+user+"&lt;br/&gt;");
+    res.write("password="+password+"&lt;br/&gt;");
+    res.write("title="+title+"&lt;br/&gt;");
+    res.write("text="+text+"&lt;br/&gt;");
+    res.end();
+  });
+});
+
+server.listen(port, ip);
+
+console.log(format("Server (POST test) running at http://%s:%d\n", ip, port));
+</code></pre>
+
+<p>執行結果：</p>
+
+<pre><code>user=ccc
+password=1234567
+title=當您死後，您在意的是公墓裏的那塊牌子，還是 facebook 上的日誌與照片呢？
+text=如果我死了！我不會在意自己被葬在哪裡，公墓裏有沒有一個骨灰罈或牌子！ 但是我會在意
+...
+...
+等著您去開發！ 
+</code></pre>
+
+<p><img src="httppost.jpg" alt="" title="" /></p>
+
+<h2 id="">網路記事本</h2>
+
+<p>接著、讓我們用一個完整的「網路記事本」範例，來說明 node.js 的表單處理過程，在這個範例中，
+我們用了 express 這個套件，以便能更方便的處理網址所對應的不同功能，在執行程式前，請先用
+下列指令安裝 express 套件。</p>
+
+<pre><code>$ npm install express -g
+</code></pre>
+
+<p>整個網路記事本的專案，您可以從下列網址下載：</p>
+
+<p>網路記事本 (下載點)：<a href="https://dl.dropboxusercontent.com/u/101584453/web/wp/code/noteserver1.zip">noteserver1.zip</a></p>
+
+<p>以下是該程式的執行過程：</p>
+
+<pre><code>D:\Dropbox\Public\wp\code\noteserver1&gt;node NoteServer.js
+start NoteServer
+
+
+note ifidie.txt
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;meta charset="utf-8" /&gt;
+&lt;/head&gt;
+....
+</code></pre>
+
+<p>以下是該程式的一些執行畫面，當您在網址上輸入以下內容時，您將可以編輯 ifidie.txt 這個檔案。</p>
+
+<pre><code>http://127.0.0.1/note/ifidie.txt
+</code></pre>
+
+<p><img src="Note_Edit1.jpg" alt="編輯已存在的檔案 ifidie.txt" title="" /></p>
+
+<p>編輯完後送出，您可以看到下列儲存訊息，此時如果您在點選 ifidie.txt 這個超連結，就能回到編輯畫面，繼續編輯其內容。</p>
+
+<p><img src="Note_Edit1.jpg" alt="編輯完後的儲存訊息 ifidie.txt" title="" /></p>
+
+<p>假如您輸入一個原本不存在的檔案名稱時，那麼內容就會顯示「檔案不存在，您可修改本文後存檔！」，然後您同樣可以編輯後
+按下「送出」鍵儲存，此時上述程式將會建立一個新的 <code>abc.txt</code> 檔案，其內容即為您所輸入的內容。</p>
+
+<p><img src="Note_Edit_new.jpg" alt="編輯不存在的檔案 abc.txt" title="" /></p>
+
+<p>上述網路記事本的完整程式碼如下所示：</p>
+
+<p>檔案：NoteServer.js</p>
+
+<pre><code class="javascript">var path = require('path');
+var fs = require("fs");
+var qs = require('querystring');
+var express = require("express");
+var app = express();    
+app.listen(80);
+
+var noteTemplate = "";
+
+fs.readFile("note.htm", "utf8", function(err, file) {
+    noteTemplate = file;
+});
+
+fs.readFile("save.htm", "utf8", function(err, file) {
+    saveTemplate = file;
+});
+
+var error = function(err, res) {
+    if (err) {
+        res.writeHead(404, {'Content-Type': 'text/plain'});
+        res.end();
+    }
+}
+
+var response = function(res, type, text) {
+    res.writeHead(200, {'Content-Type': type});
+    res.write(text);
+    console.log(text);
+    res.end();
+}
+
+app.post('/save/:path', function(req, res){
+    console.log('save ' + req.params.path);
+    var path = "./"+req.params.path;
+    formData = '';
+    req.on("data", function (chunk) {
+        formData += chunk;
+    });
+
+    req.on("end", function () {
+        form = qs.parse(formData);
+        fs.writeFile(path, form.note, function (err) {
+          if (!err)
+            response(res, "text/html", saveTemplate.replace("[[?path?]]", req.params.path)
+            .replace("[[?path?]]", req.params.path)
+            .replace("[[?path?]]", req.params.path).replace("[[?fileText?]]", form.note));
+        });
+    });    
+});
+
+app.get('/note/:path', function(req, res){
+    console.log('note ' + req.params.path);
+    var path = "./"+req.params.path;
+    fs.readFile(path, "utf8", function(err, file) {
+        if (err)
+            response(res, "text/html", noteTemplate.replace("[[?path?]]", req.params.path)
+            .replace("[[?path?]]", req.params.path).replace("[[?fileText?]]", "檔案不存在，您可修改本文後存檔！"));
+        else
+            response(res, "text/html", noteTemplate.replace("[[?path?]]", req.params.path)
+            .replace("[[?path?]]", req.params.path).replace("[[?fileText?]]", file));
+    });
+});
+
+console.log('start NoteServer\n');
+</code></pre>
+
+<p>檔案：note.htm</p>
+
+<pre><code class="html">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;meta charset="utf-8" /&gt;
+&lt;/head&gt;
+  &lt;body&gt; 
+    &lt;form method="POST" action="/save/[[?path?]]"&gt;
+      &lt;label&gt;檔案路徑：[[?path?]]&lt;/label&gt;&lt;br&gt;
+      &lt;textarea name="note" rows=30 cols=80&gt;
+[?fileText?](?fileText?.html)      
+      &lt;/textarea&gt;&lt;br/&gt;
+      &lt;input type="submit" value="送出"/&gt;
+    &lt;/form&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+<p>檔案：save.htm</p>
+
+<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;meta charset="utf-8" /&gt;
+&lt;/head&gt;
+&lt;body&gt; 
+save:path=&lt;a href="/note/[[?path?]]"&gt;[[?path?]]&lt;/a&gt;
+&lt;pre&gt;
+[?fileText?](?fileText?.html)      
+&lt;/pre&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+<p>檔案：ifidie.txt</p>
+
+<pre><code>如果我死了！我不會在意自己被葬在哪裡，公墓裏有沒有一個骨灰罈或牌子！
+
+但是我會在意自己的「照片、錄影、網誌、facebook、YouTube上的影片、電子書、以及我所創辦的程式人雜誌」是否有人接手、整理或出版。
+
+我不希望死後 facebook 上的資訊就被視為靜止戶而刪除，我不希望網誌上的資訊雜亂無章，我不希望數位相機的照片與錄影從此消失，我不希望那些美好的記憶在家人的腦海裡逐漸模糊！
+
+我希望這些資訊可以變成我的日記、著作，有人幫我剪接這些影片，在喪禮上可以回顧我的一生，我希望我的小孩有空時能透過這些資訊瞭解我，甚至是與已經身在天堂的我對話，當他有的生命遇到疑問時，可以從我的人生經驗當中得到啟發，或者些許的指引與安慰！
+
+如果我的老婆小孩經濟困難，我希望可以從我的數位遺產中找到有價值出版的作品，幫助他們度過難關，如果他們的經濟情況不錯，我希望這些價值就捐獻給公益團體。
+
+要完成這些事，就必須要有一個組織，提供「數位遺產管理」的服務。這需要有一些工具可以擷取出這些數位遺產，需要一些人力可以幫組織與整理，並且需要服務人員對家屬提供適當的協助。所以我想，這需要一整個公司，甚至整個供應鏈的配合。
+
+這是一個全新的領域 -- 「數位殯葬業 + 數位遺產管理事業」，當您抱怨網路行業都已經被 Google 、Facebook 、淘寶等公司壟斷的時候，實體的世界當中仍然有很多的創業機會，等著您去開發！
+</code></pre></div></body></html>

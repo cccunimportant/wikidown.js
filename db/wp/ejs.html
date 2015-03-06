@@ -1,0 +1,49 @@
+<html><head><meta charset="utf-8"><link href="../static.css" rel="stylesheet"><title> javascript 套件的用法 -- ejs 樣板引擎</title></head><body><div id="header_wrap"><h1><p><a href="../ccc/home.html">陳鍾誠</a>  / <a href="../book/home.html">教科書</a>  / <a href="../wp/home.html">Web程式設計</a> </p></h1></div><div id="content"><h1 id="javascriptejs">javascript 套件的用法 -- ejs 樣板引擎</h1>
+
+<h2 id="">程式</h2>
+
+<p>檔案：ejstest</p>
+
+<pre><code class="javascript">var fs = require('fs');
+var ejs = require('ejs');
+
+var template = fs.readFileSync('book.ejs', 'utf8');
+
+var html = ejs.render(template, {
+    title: '天國來的鈔票', 
+    chapter:['國王', '皇后', '大臣', '革命', '銀行家']}
+);
+
+console.log(html);
+</code></pre>
+
+<h2 id="">樣板</h2>
+
+<p>檔案：book.ejs</p>
+
+<pre><code class="javascript">&lt;h1&gt;&lt;%= title %&gt;&lt;/h1&gt;
+&lt;ol&gt;
+    &lt;% for(var i=0; i&lt;chapter.length; i++) { %&gt;
+        &lt;li&gt;&lt;%= chapter[i] %&gt;&lt;/li&gt;
+    &lt;% } %&gt;
+&lt;/ol&gt;
+</code></pre>
+
+<h2 id="">執行結果</h2>
+
+<pre><code>D:\git\ejs&gt;node ejstest
+&lt;h1&gt;天國來的鈔票&lt;/h1&gt;
+&lt;ol&gt;
+
+        &lt;li&gt;國王&lt;/li&gt;
+
+        &lt;li&gt;皇后&lt;/li&gt;
+
+        &lt;li&gt;大臣&lt;/li&gt;
+
+        &lt;li&gt;革命&lt;/li&gt;
+
+        &lt;li&gt;銀行家&lt;/li&gt;
+
+&lt;/ol&gt;
+</code></pre></div></body></html>

@@ -1,0 +1,254 @@
+<html><head><meta charset="utf-8"><link href="../static.css" rel="stylesheet"><title> Node.js -- Web 程式</title></head><body><div id="header_wrap"><h1><p><a href="../ccc/home.html">陳鍾誠</a>  / <a href="../book/home.html">教科書</a>  / <a href="../wp/home.html">Web程式設計</a> </p></h1></div><div id="content"><h1 id="nodejsweb">Node.js -- Web 程式</h1>
+
+<h2 id="web">第一個 Web 程式</h2>
+
+<p>程式：HelloWeb.js</p>
+
+<pre><code class="javascript">var http = require('http');
+http.createServer(function (req, res) {
+  res.writeHead(200, {'Content-Type': 'text/plain'});
+  res.end('Hello Node.js!\n');
+}).listen(80, '127.0.0.1');
+console.log('Server running at http://127.0.0.1:80/');
+</code></pre>
+
+<p>執行結果</p>
+
+<pre><code>D:\ccc101\nodejs&gt;node WebHello.js
+Server running at http://127.0.0.1:80/
+</code></pre>
+
+<p><img src="WebHello.jpg" alt="" title="" /></p>
+
+<h2 id="htmlserver">HtmlServer</h2>
+
+<p>執行結果：</p>
+
+<p><img src="NodeHtmlServer.jpg" alt="" title="" /></p>
+
+<pre><code class="javascript">var server,
+    ip   = "127.0.0.1",
+    port = 80,
+    http = require('http'),
+    fs = require("fs"),
+    folderPath = ".",
+    url = require('url'),
+    path,
+    filePath,
+    encode = "utf8";
+
+server = http.createServer(function (req, res) {
+    path = url.parse(req.url);
+    filePath = folderPath + path.pathname;
+    console.log("filePath="+filePath);
+    fs.readFile(filePath, encode, function(err, file) {
+      console.log("err="+err);
+      if (err) {
+          res.writeHead(404, {'Content-Type': 'text/plain'});
+          res.end();
+          return;
+      }
+
+      res.writeHead(200, {'Content-Type': 'text/html'});
+      res.write(file);
+      console.log(file);
+      res.end();
+    });
+});
+
+server.listen(port, ip);
+
+console.log("Server running at http://" + ip + ":" + port);
+</code></pre>
+
+<h2 id="webserver">簡易 WebServer</h2>
+
+<p>由於 node.js 採用 Event Queue 的方式執行 (類似 Win3.1 中的協同式多工)，而沒有採用 Thread 的方式，因此對所有 輸出入 IO 都應該盡可能採用非同步的方式執行，這樣才能讓 node.js 程式發揮最大的效能，否則就會因為 IO 而卡住。</p>
+
+<p>因此以下兩個版本當中，以非同步版速度較快。</p>
+
+<h3 id="webservernodejs">簡易 WebServer ：同步版 (效能較差，不符合 node.js 的設計理念)</h3>
+
+<pre><code class="javascript">var path = require('path');
+var fs = require("fs");
+var qs = require('querystring');
+var express = require("express");
+var app = express();    
+app.listen(80);
+
+var response = function(res, type, text) {
+    res.writeHead(200, {'Content-Type': type});
+    res.write(text);
+    console.log(text);
+    res.end();
+}
+
+app.get('*', function(req, res){
+  try {
+    var path = '.' + req.url;
+    fs.stat(path, function(err, pathStat) {
+        if (err) {
+            response(res, "text/plain", err.toString());
+            return;
+        }
+        if (pathStat.isFile()) {
+            fs.readFile(path, "utf8", function(err, file) {
+                response(res, "text/html", file);
+            });
+        } else if (pathStat.isDirectory()) {
+            var dirPath = req.url;
+            if (dirPath.substring(-1)!=="/") 
+                dirPath = dirPath+"/";
+            var html = "&lt;html&gt;&lt;body&gt;&lt;h1&gt;"+req.url+"&lt;/h1&gt;\n";
+            fs.readdir(path, function(err, files) {
+                for (f in files) {
+                    fname = files[f];
+                    filePath = dirPath+fname;
+                    html += "&lt;li&gt;&lt;a href='"+filePath+"'&gt;"+fname+"&lt;/a&gt;&lt;/li&gt;\n";
+                }
+                html += "&lt;body&gt;&lt;/html&gt;";
+                response(res, "text/html", html);
+            });
+        } 
+    });    
+  } catch (err) {
+    response(res, "text/plain", err.toString());
+  }
+});
+
+console.log('start WebServer\n');
+</code></pre>
+
+<h3 id="webservernodejs">簡易 WebServer ：非同步版 (效能較好，符合 node.js 的設計理念)</h3>
+
+<pre><code class="javascript">var path = require('path');
+var fs = require("fs");
+var qs = require('querystring');
+var express = require("express");
+var app = express();    
+app.listen(80);
+
+var response = function(res, type, text) {
+    res.writeHead(200, {'Content-Type': type});
+    res.write(text);
+    console.log(text);
+    res.end();
+}
+
+app.get('*', function(req, res){
+  try {
+    var path = '.' + req.url;
+    fs.stat(path, function(err, pathStat) {
+        if (pathStat.isFile()) {
+            fs.readFile(path, "utf8", function(err, file) {
+                response(res, "text/html", file);
+            });
+        } else if (pathStat.isDirectory()) {
+            var html = "&lt;html&gt;&lt;body&gt;";
+            fs.readdir(path, function(err, files) {
+                for (f in files) {
+                    fname = files[f];
+                    filePath = req.url+fname;
+                    html += "&lt;li&gt;&lt;a href='"+filePath+"'&gt;"
+                             +filePath+"&lt;/a&gt;&lt;/li&gt;\n";
+                }
+                html += "&lt;body&gt;&lt;/html&gt;";
+                response(res, "text/html", html);
+            });
+        } 
+    });    
+  } catch (err) {
+    response(res, "text/plain", err.toString());
+  }
+});
+
+console.log('start WebServer\n');
+</code></pre>
+
+<h2 id="webserver">較完整的 WebServer (非同步版)</h2>
+
+<p>程式：WebServer2.js</p>
+
+<pre><code class="javascript">var path = require('path');
+var fs = require("fs");
+var qs = require('querystring');
+var express = require("express");
+var app = express();
+
+var mimeType = {
+   "jpg":"image/jpeg", 
+   "gif":"image/gif", 
+   "png":"image/png", 
+   "svg":"image/svg",
+   "zip":"application/zip", 
+   "pdf":"application/pdf", 
+   "xls":"application/vnd.ms-excel", 
+   "ppt":"application/vnd.ms-powerpoint", 
+   "doc":"application/msword", 
+   "htm":"text/html", 
+   "html":"text/html"
+};
+
+function getMimeType(ext) {
+    var type = mimeType[ext];
+    if (!type)
+        return "text/plain";
+    else
+        return type;
+}
+
+app.listen(80);
+
+var response = function(res, type, data) {
+    res.writeHead(200, {'Content-Type': type});
+    if (type.indexOf("text/")&gt;=0)
+        res.end(data);
+    else
+        res.end(data, "binary");
+}
+
+app.get('*', function(req, res){
+  try {
+    var path = '.' + req.url;
+    fs.stat(path, function(err, pathStat) {
+        if (err) {
+            response(res, "text/plain", err.toString());
+            return;
+        }
+        if (pathStat.isFile()) {
+            fs.readFile(path, function(err, file) {
+                var tokens = path.split(".");
+                var ext = tokens[tokens.length-1];
+                response(res, getMimeType(ext), file);
+            });
+        } else if (pathStat.isDirectory()) {
+            var dirPath = req.url;
+            if (dirPath.substring(-1)!=="/") 
+                dirPath = dirPath+"/";
+            var html = "&lt;html&gt;&lt;body&gt;&lt;h1&gt;"+req.url+"&lt;/h1&gt;\n";
+            fs.readdir(path, function(err, files) {
+                for (f in files) {
+                    fname = files[f];
+                    filePath = dirPath+fname;
+                    html += "&lt;li&gt;&lt;a href='"+filePath+"'&gt;"+fname+"&lt;/a&gt;&lt;/li&gt;\n";
+                }
+                html += "&lt;body&gt;&lt;/html&gt;";
+                response(res, "text/html", html);
+            });
+        } 
+    }); 
+  } catch (err) {
+    response(res, "text/plain", err.toString());
+  }
+});
+
+console.log('start WebServer\n');
+</code></pre>
+
+<h2 id="">參考文獻</h2>
+
+<ul>
+<li>深入浅出Node.js相关的内容 -- <a href="http://www.infoq.com/cn/master-nodejs">http://www.infoq.com/cn/master-nodejs</a>
+<ul><li>深入浅出Node.js（一）：什么是Node.js -- http://www.infoq.com/cn/articles/what-is-nodejs</li>
+<li>深入浅出Node.js（三）：深入Node.js的模块机制 -- http://www.infoq.com/cn/articles/nodejs-module-mechanism</li></ul></li>
+</ul></div></body></html>
