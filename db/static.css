@@ -129,7 +129,7 @@ strong {
   color:white;
 }
 
-#header_wrap  h1, #header_wrap  h1 sub, #header_wrap  h1 a {
+#header_wrap  h1, #header_wrap  h1 p, #header_wrap  h1 sub, #header_wrap  h1 a {
   color:white;
   font-family: 'DFKai-sb', 'Tahoma';
 }
