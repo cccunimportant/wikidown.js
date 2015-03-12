@@ -54,7 +54,7 @@ function bookTitleHtml(domain) {
   if (title[domain] !== undefined)
     titleHead = title[domain];
   c.log(titleHead);
-  return wd2html(titleHead, domain);
+  return wd2html(' [[<<]](main:home) '+titleHead, domain);
 }
 
 function processWd(wdFile, wdPath, template) {
@@ -82,7 +82,7 @@ function processWd(wdFile, wdPath, template) {
 
 // c.log(config);
 
-var template = '<html><head><meta charset="utf-8"><link href="../static.css" rel="stylesheet"><title>?pageTitle?</title></head><body><div id="header_wrap"><h1>?bookTitle?</h1></div><div id="content">?wdHtml?</div></body></html>';
+var template = '<html><head><meta charset="utf-8"><link href="../static.css" rel="stylesheet"><title>?pageTitle?</title></head><body><header>?bookTitle?</header><main>?wdHtml?</main></body></html>';
 
 var dir;
 

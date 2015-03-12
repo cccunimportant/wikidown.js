@@ -1,0 +1,24 @@
+0 info it worked if it ends with ok
+1 verbose cli [ 'c:\\Program Files\\nodejs\\node.exe',
+1 verbose cli   'c:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js',
+1 verbose cli   'version',
+1 verbose cli   'showdown' ]
+2 info using npm@1.4.28
+3 info using node@v0.10.35
+4 error version Bad package.json data
+5 error SyntaxError: Unexpected string
+5 error     at Object.parse (native)
+5 error     at c:\Program Files\nodejs\node_modules\npm\lib\version.js:54:19
+5 error     at evalmachine.<anonymous>:272:14
+5 error     at c:\Program Files\nodejs\node_modules\npm\node_modules\graceful-fs\graceful-fs.js:102:5
+5 error     at Object.oncomplete (evalmachine.<anonymous>:108:15)
+6 error If you need help, you may report this *entire* log,
+6 error including the npm and node versions, at:
+6 error     <http://github.com/npm/npm/issues>
+7 error System Windows_NT 6.2.9200
+8 error command "c:\\Program Files\\nodejs\\node.exe" "c:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js" "version" "showdown"
+9 error cwd d:\git\wikidown2.2.js
+10 error node -v v0.10.35
+11 error npm -v 1.4.28
+12 error type unexpected_token_string
+13 verbose exit [ 1, true ]

@@ -1,6 +1,32 @@
+a {
+  text-decoration: none;
+  color: #007edf;
+  text-shadow: none;
+  transition: color 0.5s ease;
+  transition: text-shadow 0.5s ease;
+}
+
+a:hover {
+  text-shadow: 2px 2px 8px #33aeff;
+  text-decoration: none;
+// 陰影產生器 -- http://css3gen.com/text-shadow/
+}
+
 #titleHead * { color:#999999; font-weight:bold; text-decoration:none; }
 #titleHead a:hover { color:#bbbbbb; text-decoration:none; }
 .innerLink { color:#996633; }
+
+/*===========================================================*/
+
+.panel {
+  margin:10px;
+  padding:10px;
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+}
+
+/* ========================================================= */
 
 ruby {
   ruby-align: center;
@@ -88,7 +114,7 @@ li {
 footer p {
   color: #f2f2f2;
 }
-
+/*
 a {
   text-decoration: none;
   color: #007edf;
@@ -105,7 +131,7 @@ a {
   -ms-transition: color 0.5s ease;
   -ms-transition: text-shadow 0.5s ease;
 }
-
+*/
 table {
   border-collapse: collapse;
   border-spacing: 0;

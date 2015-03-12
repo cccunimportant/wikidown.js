@@ -1,49 +1,72 @@
 /* ==================== pmag.css ===========================*/
-
-html, body, div, span, applet, object, iframe,
-p, blockquote, pre,
-a, abbr, acronym, address, big, cite, code,
-del, dfn, em, img, ins, kbd, q, s, samp,
-small, strike, strong, sub, sup, tt, var,
-b, u, i, center,
-dl, dt, dd,
-fieldset, form, label, legend,
-table, caption, tbody, tfoot, thead, tr, th, td,
-article, aside, canvas, details, embed,
-figure, figcaption, footer, header, hgroup,
-menu, nav, output, ruby, section, summary,
-time, mark, audio, video {
+html, body, header, footer, aside {
   margin: 0;
-  padding: 0;
+  padding: padding 8px 16px 8px 16px;
   border: 0;
   font: inherit;
   vertical-align: baseline;
   line-height:160%;
 }
 
-#cover-image {
+body {
+  overflow-y: scroll;
   width:100%;
 }
 
-div>ol.toc {
-  list-style-type:disc;
+header, footer {
+  margin: 0;
+  padding: 8px 16px 8px 16px;
+  border: 0;
+  font: inherit;
+  vertical-align: baseline;
 }
 
-ol.toc {
-  list-style-type:circle;
+header {
+  background-color:black;
+  color:white;
+  font-size: 150%;
 }
 
-blockquote {
-  margin: 10px;
-  padding-left: 10px;
-  padding-right: 10px;
-  padding-top: 1px;
-  padding-bottom: 1px;
-  border: 3px double #373737;
-  color:#333333;  
+nav, nav a {
+    line-height:30px;
+    color:yellow;
+    background-color:black;
+    padding:5px;        
 }
 
-h1, h1 a { font-size: xx-large; color:#050505; text-align:center; margin:30px; font-weight: bold; font-family: 'DFKai-sb', 'Tahoma'; }
+main, div, aside, article, section {
+  margin:10px;
+  padding:10px;    
+  border: #888888 1px dotted;    
+}
+
+main {
+  display:table-cell;  
+}
+
+aside {
+    width:20%;
+    float:left;
+    display:table-cell;
+}
+
+footer {
+    color:#888888;
+    clear:both;
+    text-align:center;
+    padding:5px; 
+    border-top: #888888 1px dotted;  
+}
+header p {
+  color: #aaaaaa;
+}
+
+header a {
+  color: #eeeeee;
+  font-family: '標楷體', 'Times New Roman';
+}
+
+h1, h1 a { font-size: xx-large; color:#050505; text-align:center; margin:10px; font-weight: bold; font-family: 'DFKai-sb', 'Tahoma'; }
 
 h2, h2 a { font-size: x-large; color:#8B008B; margin-top:30px; margin-bottom:30px; font-weight: bold; font-family: 'DFKai-sb', 'Tahoma'; }
 
@@ -55,36 +78,30 @@ h5, h5 a { font-size: small ;  color:#708090; font-weight: bold; font-family: 'D
 
 h6, h6 a { font-size: x-small; color:#000080; }
 
+blockquote {
+  margin: 10px;
+  padding: 10px;
+  border: 3px double #373737;
+  color:#333333;
+}
+
 p {
-  font-family: 'Pmingliu', 'Tahoma';
   margin: 10px 0 15px 0;
-  font-size:100%;
   color:#353535;
-}
-
-li {
-  font-size:100%;
-}
-
-footer p {
-  color: #f2f2f2;
 }
 
 a {
   text-decoration: none;
   color: #007edf;
   text-shadow: none;
-
   transition: color 0.5s ease;
   transition: text-shadow 0.5s ease;
-  -webkit-transition: color 0.5s ease;
-  -webkit-transition: text-shadow 0.5s ease;
-  -moz-transition: color 0.5s ease;
-  -moz-transition: text-shadow 0.5s ease;
-  -o-transition: color 0.5s ease;
-  -o-transition: text-shadow 0.5s ease;
-  -ms-transition: color 0.5s ease;
-  -ms-transition: text-shadow 0.5s ease;
+}
+
+a:hover {
+  text-shadow: 2px 2px 8px #33aeff;
+  text-decoration: none;
+// 陰影產生器 -- http://css3gen.com/text-shadow/
 }
 
 table {
@@ -108,7 +125,7 @@ td {
   vertical-align: middle;
   border: 1px solid #373737;
 }
- 
+
 em {
   color: blue;
 }
@@ -119,51 +136,6 @@ strong {
 }
 
 
-#header_wrap {
-  margin: 0;
-  padding: 16px;
-  border: 0;
-  font: inherit;
-  vertical-align: baseline;
-  background-color:black;
-  color:white;
-}
-
-#header_wrap  h1, #header_wrap  h1 p, #header_wrap  h1 sub, #header_wrap  h1 a {
-  color:white;
-  font-family: 'DFKai-sb', 'Tahoma';
-}
-
-#header_wrap  sub {
-  color:white;
-  font-size:60%;
-}
-
-#bar, #bar a, #header_wrap  a, #header_wrap  h1 sub a  {
-  color:white;
-  width:95%;
-  text-align:right;
-  font-weight:bold;
-}
-
-.title, .author, .date {
-  color:#333333;
-  text-align:center;
-  font-family: 'DFKai-sb', 'Tahoma' ;
-}
-
-.title { font-size:xx-large;  line-height:800%; }
-
-.author { font-size:large;  line-height:300%; }
-
-.date { font-size:large;   line-height:300%; }
-
-
-#content {
-  margin:10px;
-  padding:10px;
-}
-
 pre {
   border: 1px solid #373737;
   background-color:#efefef;
@@ -171,6 +143,7 @@ pre {
   font-size:medium;
   width:95%;
   padding:10px;
+  margin:10px;
   /* wrap ，自動換行 */
   white-space: pre-wrap;       /* css-3 */
   white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
@@ -179,18 +152,12 @@ pre {
   word-wrap: break-word;       /* Internet Explorer 5.5+ */    
 }
 
-code {
-//  font-family: SimSun;
-//  color:blue;
-  font-size:100%;
-}
-
-pre code {
+pre code, code {
   font-family: SimSun;
   font-size:125%;
 }
 
-.figure {
+img, .figure, .figure img {
   margin:10px;
   padding:10px;
   margin-left: auto;
@@ -198,27 +165,8 @@ pre code {
   display: block;
 }
 
-img { vertical-align:middle; }
-
-.figure img {
-  margin-left: auto;
-  margin-right: auto;
-  display: block;
-}
-
 .figure .caption {
   text-align:center;
-}
-
-#TOC {
-}
-
-#footer {
-  text-align:center;
-  font-size:small;
-  color:#6f6f6f;
-  margin: 10px;
-  padding: 10px;
 }
 
 /* JavaScript Style */
@@ -239,150 +187,3 @@ code > span.ot { color: #007020; }
 code > span.al { color: #ff0000; font-weight: bold; }
 code > span.fu { color: #06287e; }
 code > span.er { color: #ff0000; font-weight: bold; }
-
-/* ===================bootstrap======================== */
-/* Move down content because we have a fixed navbar that is 50px tall */
-.form-signin {
-  max-width: 330px;
-  padding: 15px;
-  margin: 0 auto;
-}
-.form-signin .form-signin-heading,
-.form-signin .checkbox {
-  margin-bottom: 10px;
-}
-.form-signin .checkbox {
-  font-weight: normal;
-}
-.form-signin .form-control {
-  position: relative;
-  height: auto;
-  -webkit-box-sizing: border-box;
-     -moz-box-sizing: border-box;
-          box-sizing: border-box;
-  padding: 10px;
-  font-size: 16px;
-}
-.form-signin .form-control:focus {
-  z-index: 2;
-}
-.form-signin input[type="email"] {
-  margin-bottom: -1px;
-  border-bottom-right-radius: 0;
-  border-bottom-left-radius: 0;
-}
-.form-signin input[type="password"] {
-  margin-bottom: 10px;
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
-}
-
-.footer {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  /* Set the fixed height of the footer here */
-  height: 60px;
-  background-color: #f5f5f5;
-}
-
-/*
- * Base structure
- */
-
-
-/*
- * Global add-ons
- */
-
-.sub-header {
-  padding-bottom: 10px;
-  border-bottom: 1px solid #eee;
-}
-
-/*
- * Top navigation
- * Hide default border to remove 1px line.
- */
-.navbar-fixed-top {
-  border: 0;
-}
-
-/*
- * Sidebar
- */
-
-/* Hide for mobile, show later */
-.sidebar {
-  display: none;
-}
-@media (min-width: 768px) {
-  .sidebar {
-    position: fixed;
-    top: 51px;
-    bottom: 0;
-    left: 0;
-    z-index: 1000;
-    display: block;
-    padding: 20px;
-    overflow-x: hidden;
-    overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
-    background-color: #f5f5f5;
-    border-right: 1px solid #eee;
-  }
-}
-
-/* Sidebar navigation */
-.nav-sidebar {
-  margin-right: -21px; /* 20px padding + 1px border */
-  margin-bottom: 20px;
-  margin-left: -20px;
-}
-.nav-sidebar > li > a {
-  padding-right: 20px;
-  padding-left: 20px;
-}
-.nav-sidebar > .active > a,
-.nav-sidebar > .active > a:hover,
-.nav-sidebar > .active > a:focus {
-  color: #fff;
-  background-color: #428bca;
-}
-
-
-/*
- * Main content
- */
-
-.main {
-  padding: 20px;
-}
-@media (min-width: 768px) {
-  .main {
-    padding-right: 40px;
-    padding-left: 40px;
-  }
-}
-.main .page-header {
-  margin-top: 0;
-}
-
-
-/*
- * Placeholder dashboard ideas
- */
-
-.placeholders {
-  margin-bottom: 30px;
-  text-align: center;
-}
-.placeholders h4 {
-  margin-bottom: 0;
-}
-.placeholder {
-  margin-bottom: 20px;
-}
-.placeholder img {
-  display: inline-block;
-  border-radius: 50%;
-}

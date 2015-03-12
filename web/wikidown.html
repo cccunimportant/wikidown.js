@@ -1,9 +1,10 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <link rel="icon" href="favicon.ico">
+  <link href="favicon.ico" rel="icon">
   <link href="css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="css/highlight.default.min.css">
+  <link href="css/highlight.default.min.css" rel="stylesheet">
+  <link href="css/fileinput.css" media="all" rel="stylesheet"/>
   <link href="main.css" rel="stylesheet">
   <title>Wikidown</title>
 </head>
@@ -36,10 +37,6 @@
           <li class="dropdown">
             <a class="dropdown-toggle" data-toggle="dropdown" id="modeMenu">登入</a>
             <ul class="dropdown-menu" role="menu">
-        <!--
-                <li><a onclick="show()">預覽</a></li>
-                <li><a onclick="edit()">編輯</a></li>
-              -->
               <li><a onclick="login()">登入</a></li>
               <li><a onclick="logout()">登出</a></li>
             </ul>
@@ -50,8 +47,8 @@
             <input id="filepath" type="hidden" class="form-control" placeholder="filepath" aria-describedby="basic-addon1">
             <button class="btn btn-success" type="button" onclick="show()">預覽</button>
             <button class="btn btn-success" type="button" onclick="edit()">編輯</button>
-            <!--        <button class="btn btn-success" type="button" onclick="load()">載入</button>-->
-            <button class="btn btn-success" type="button" onclick="saveFile()">儲存</button>
+            <button class="btn btn-success" type="button" onclick="save()">儲存</button>
+            <button class="btn btn-success" type="button" onclick="upload()">上傳</button>
           </div>
         </form>     
       </div>
@@ -61,12 +58,21 @@
   <div id="panelShow" class="tab-pane panel"> <!-- 預覽 -->
     <div id="htmlBox" class="container"></div>
   </div>
-  <center> <!-- 編輯 -->
-    <div id="panelEdit" class="tab-pane panel" style="width:90%; height:90%;">
-      <br/>
-      <textarea id="wdBox" class="form-control" style="width:100%; height:100%"></textarea>
+  <div id="panelEdit" class="tab-pane panel"> <!-- 編輯 -->
+    <br/>
+    <textarea id="wdBox" class="form-control" style="width:100%; height:80%"></textarea>
+  </div>
+  <div id="panelUpload" class="tab-pane panel" style="height:75%">
+    <center>
+    <div class="kv-main">
+      <form enctype="multipart/form-data">
+        <div class="form-group">
+		  <input id="imageUpload" name="imageUpload" type="file" multiple=true class="file-loading">
+        </div>
+      </form>
     </div>
-  </center>
+    </center>
+  </div>
   <div id="panelLogin" class="tab-pane panel"> <!-- 登入 -->
     <form class="form-signin" role="form">
       <input type="text" id="loginUser" class="form-control" required autofocus data-mt="User" placeholder="帳號"/>
@@ -87,6 +93,15 @@
     return { domain:tokens[0], file:tokens[1] };
   }
 
+  function isLogin() {
+	if (sessionStorage.login !== "true") {
+		alert('未登入無法存檔上傳，請先登入!');
+		login();
+		return false;
+	}
+	return true;
+  }
+
   Server = {};
 
   Server.save=function(domain, file, doc) {
@@ -100,8 +115,7 @@
       alert( "存檔完成!");
     })
     .fail(function() {
-      alert( "存檔失敗，請登入！" );
-      login();
+      alert( "存檔失敗！" );
     });
   }
 
@@ -122,11 +136,13 @@
       data: { user:$('#loginUser').val(), password:$('#loginPassword').val() },
     })
     .done(function(data) {
+	  sessionStorage.login = "true";
       alert( "登入成功!");
       $('#loginPassword').val('');
       edit();
     })
     .fail(function() {
+	  sessionStorage.login = "false";
       alert( "登入失敗！" );
       login();
     });
@@ -140,6 +156,7 @@
       data: {},
     })
     .done(function(data) {
+	  sessionStorage.login = "false";
       alert( "登出成功!");
       show();
     })
@@ -147,7 +164,6 @@
       alert( "登出失敗！" );
     });
   }
-
 
   window.onhashchange = function () {
     filepath = window.location.hash.substring(1);
@@ -158,7 +174,6 @@
   window.onbeforeunload = function(){}
 
   function md2html(md) {
-    // return markdown.toHTML(md, 'Maruku');
 	return converter.makeHtml(md);
   }
   
@@ -191,10 +206,11 @@
 
 function wdToHtml(wd) {
   wd  = '\n'+wd+' ';
+  wd  = wd.replace(/(\s)@\[\[([^\]]*?)\]\]\((.*?)\)/gi, '$1<a href="../db/'+path().domain+'/$3" class="innerLink">$2</a>'); // 內部檔案 [[text]](pathToFile)
   wd  = wd.replace(/(\s)\!\[\[([^\]]*?)\]\]\((.*?)\)/gi, '$1<div class="figure"><img src="../db/'+path().domain+'/$3"/><p class="caption">$2</p></div>'); // 內部圖片 ![[text]](file)
   wd  = wd.replace(/(\s)\[\[([^\]]+?)\]\]\(([^:\)]+):([^:\)]+)\)/gi, '$1<a href="#$3:$4" class="innerLink">$2</a>'); // 內部連結 [[text]](domain:file)
   wd  = wd.replace(/(\s)\[\[([^\]]+?)\]\]\((.*?)\)/gi, '$1<a href="#'+path().domain+':$3" class="innerLink">$2</a>'); // 內部連結 [[text]](file)
-  wd  = wd.replace(/(\s)\[\[([^\]:]+):([^\]:]+)\]\]/gi, '$1<a href="#$2:$3" class="innerLink">$2:$3</a>'); // 內部連結 [[file]]
+  wd  = wd.replace(/(\s)\[\[([^\]:]+):([^\]:]+)\]\]/gi, '$1<a href="#$2:$3" class="innerLink">$2:$3</a>'); // 內部連結 [[domain:file]]
   wd  = wd.replace(/(\s)\[\[([^\]:]+?)\]\]/gi, '$1<a href="#'+path().domain+':$2" class="innerLink">$2</a>'); // 內部連結 [[file]]
   wd  = wd.replace(/(\s)\$([^$\n]+?)\$/gi, '$1<script type="math/tex">$2</'+'script>');// 數學式 $$[latex]$$,  刻意把 '</'+'script>' 分開，避免瀏覽器認為是真的 script 區塊
   return md2html(wd);
@@ -202,7 +218,6 @@ function wdToHtml(wd) {
 
 function login() {
   switchPanel('panelLogin');
-//  $('#modeMenu').html('登入');
 }
 
 function logout() {
@@ -211,7 +226,21 @@ function logout() {
 
 function edit() {
   switchPanel('panelEdit');
-//  $('#modeMenu').html('編輯');
+}
+
+function upload() {
+  if (!isLogin()) return;
+  switchPanel('panelUpload');
+//  alert('/upload/'+path().domain);
+  $("#imageUpload").fileinput({
+    uploadUrl: "/upload/"+path().domain,
+    maxFileCount: 10,
+    uploadAsync: false,
+    uploadExtraData: {
+        domain: path().domain,
+        file: path().file
+    }
+  });
 }
 
 function show() {
@@ -225,7 +254,6 @@ function show() {
   switchPanel('panelShow');
   if (typeof(MathJax) !== 'undefined')
     MathJax.Hub.Queue(["Typeset",MathJax.Hub, "htmlBox"]);
-//  $('#modeMenu').html('預覽');
   showTitle();
 }
 
@@ -266,22 +294,8 @@ function loadFile(filepath) {
 //  window.history.pushState(state, $('title').innerText, '/db/'+domain+'/'+file+'.html');
 }
 
-/*
-function load() {
-  filepath = $('#filepath').val();
-  loadFile(filepath);
-}
-*/
-/*
-  window.addEventListener('popstate', function(e){
-    if (history.state){
-      var state = e.state;
-      //do something(state.url, state.title);
-    }
-  }, false);
-*/
-
-function saveFile() {
+function save() {
+  if (!isLogin()) return;
   var wd = $('#wdBox').val();
   Server.save(path().domain, path().file, wd);
 }
@@ -292,9 +306,10 @@ document.write('<'+'script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js
 
 <script src="js/Showdown/Showdown.min.js"></script>
 <script src="js/Showdown/extensions/table.min.js"></script>
-<!-- <script src="js/markdown.min.js"></script> -->
 <script src="js/highlight.min.js"></script>
+<script src="js/fileinput.js" type="text/javascript"></script>
 <script src="config.js"></script>
 <!--    <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_SVG"></script>-->
 </body>
 </html>
+
