@@ -1,5 +1,5 @@
 /* ==================== pmag.css ===========================*/
-html, body, header, footer, aside {
+html, body, header, footer, aside, main {
   margin: 0;
   padding: padding 8px 16px 8px 16px;
   border: 0;
@@ -34,14 +34,15 @@ nav, nav a {
     padding:5px;        
 }
 
-main, div, aside, article, section {
+div, aside, article, section {
   margin:10px;
   padding:10px;    
   border: #888888 1px dotted;    
 }
 
 main {
-  display:table-cell;  
+  width:100%;
+  padding:16px;
 }
 
 aside {
