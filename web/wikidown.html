@@ -299,9 +299,13 @@ function save() {
   var wd = $('#wdBox').val();
   Server.save(path().domain, path().file, wd);
 }
-
+/*
 // 以下這種作法是為了加快速度，避免一開始載入 MathJax 花太久時間 ...
-document.write('<'+'script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_SVG"></'+'script>');  // 刻意把 '</'+'script>' 分開，避免瀏覽器認為是真的 script 區塊
+// 刻意把 '</'+'script>' 分開，避免瀏覽器認為是真的 script 區塊
+$( document ).ready(function() {
+    $('body').append('<'+'script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_SVG"></'+'script>');
+});
+*/
 </script>
 
 <script src="js/Showdown/Showdown.min.js"></script>

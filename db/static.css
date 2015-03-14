@@ -37,16 +37,22 @@ nav, nav a {
 div, aside, article, section {
   margin:10px;
   padding:10px;    
-  border: #888888 1px dotted;    
+//  border: #888888 1px dotted;    
+}
+
+article {
+  margin-left:auto; 
+  margin-right:auto;
+//  display:teble-cell;
 }
 
 main {
-  width:100%;
   padding:16px;
+//  display:table-cell;
 }
 
 aside {
-    width:20%;
+    width:3%;
     float:left;
     display:table-cell;
 }
@@ -67,7 +73,7 @@ header a {
   font-family: '標楷體', 'Times New Roman';
 }
 
-h1, h1 a { font-size: xx-large; color:#050505; text-align:center; margin:20px; font-weight: bold; font-family: 'DFKai-sb', 'Tahoma';  }
+h1, h1 a { font-size: xx-large; color:#050505; text-align:center; margin:30px 10px 30px 10px; font-weight: bold; font-family: 'DFKai-sb', 'Tahoma';  }
 
 h2, h2 a { font-size: x-large; color:#8B008B; margin-top:30px; margin-bottom:30px; font-weight: bold; font-family: 'DFKai-sb', 'Tahoma'; }
 

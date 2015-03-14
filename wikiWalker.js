@@ -82,7 +82,7 @@ function processWd(wdFile, wdPath, template) {
 
 // c.log(config);
 
-var template = '<html><head><meta charset="utf-8"><link href="../static.css" rel="stylesheet"><title>?pageTitle?</title></head><body><header>?bookTitle?</header><main>?wdHtml?</main></body></html>';
+var template = '<html><head><meta charset="utf-8"><link href="../static.css" rel="stylesheet"><title>?pageTitle?</title></head><body><header>?bookTitle?</header><main><article>?wdHtml?</article></main></body></html>';
 
 var dir;
 

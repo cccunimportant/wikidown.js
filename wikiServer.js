@@ -15,7 +15,10 @@ var app = express();
 var webDir = path.join(__dirname, 'web');
 var dbRoot = path.join(__dirname, 'db');
 
-function isLogin(req) {
+function isPass(req) {
+  c.log("loginToSave="+setting.loginToSave+' req.session.user='+req.session.user);
+  if (setting.loginToSave === false) 
+    return true;
   return typeof(req.session.user)!=='undefined';
 }
 
@@ -25,15 +28,16 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use('/web/', express.static(webDir));
 app.use('/web/', serveIndex(webDir, {'icons': true}));
 app.use('/db/', express.static(dbRoot));
+// app.use('/db/', serveIndex(dbRoot, {'icons': true})); // 不能加這行，會擋掉寫入動作。
 
 app.use(multer({
   dest: './db/',
   onFileUploadStart: function (file, req, res) {
-    if (!isLogin(req)) return false;
-	return true;
+    if (!isPass(req)) return false;
+    return true;
   },
   rename: function (fieldname, filename, req, res) {
-	domain = req.url.match(/\/([^\/]+)$/)[1];
+  domain = req.url.match(/\/([^\/]+)$/)[1];
     return domain+'/'+filename.replace(/\W+/g, '-').toLowerCase();
   },
   onParseEnd: function (req, next) {
@@ -52,14 +56,14 @@ function response(res, code, msg) {
 }
 
 app.post('/upload/:domain', function(req, res){
-  if (!isLogin(req)) response(res, 500, '{}');
+  if (!isPass(req)) response(res, 500, '{}');
   if(done==true){
-	c.log('======upload==========');
-	c.log('req.body=%j', req.body);
-	c.log('req.files=%j', req.files);
-	response(res, 200, '{}');
-	// 傳回給 krajee bootstrap file-input 的訊息，必須是一個 JSON 格式的物件
-	// 請參考： http://webtips.krajee.com/ajax-based-file-uploads-using-fileinput-plugin/
+    c.log('======upload==========');
+    c.log('req.body=%j', req.body);
+    c.log('req.files=%j', req.files);
+    response(res, 200, '{}');
+    // 傳回給 krajee bootstrap file-input 的訊息，必須是一個 JSON 格式的物件
+    // 請參考： http://webtips.krajee.com/ajax-based-file-uploads-using-fileinput-plugin/
   }
  }
 );
@@ -69,31 +73,30 @@ app.get("/", function(req, res) {
 });
 
 app.post("/db/:domain/:file", function(req, res) {
-  c.log("loginToSave="+setting.loginToSave);
-  if (setting.loginToSave === true && req.session.user === undefined) {
-   response(res, 500, 'Please login to save!')
-   return;
- }
- var domain = req.params.domain;
- var file   = req.params.file;
- var obj    = req.body.obj;
- c.log("domain="+domain+" file="+file);
- fs.writeFile(dbRoot+"/"+domain+"/"+file, obj, function(err) {
-  if (err)
-    response(res, 500, 'write fail!');
-  else
-    response(res, 200, 'write success!');
- })
+  if (!isPass(req)) {
+    response(res, 500, 'Please login to save!')
+    return;
+  }
+  var domain = req.params.domain;
+  var file   = req.params.file;
+  var obj    = req.body.obj;
+  c.log("domain="+domain+" file="+file);
+  fs.writeFile(dbRoot+"/"+domain+"/"+file, obj, function(err) {
+    if (err)
+      response(res, 500, 'write fail!');
+    else
+      response(res, 200, 'write success!');
+  })
 });
 
 app.post("/login", function(req, res) {
   var user = req.body.user;
   if (passwords[user] === req.body.password) {
-   req.session.user = user;
-   response(res, 200, user+":login success!");
- } else {
-   response(res, 500, user+":login fail!");
- }
+    req.session.user = user;
+    response(res, 200, user+":login success!");
+  } else {
+    response(res, 500, user+":login fail!");
+  }
 });
 
 app.post("/logout", function(req, res) {
@@ -101,7 +104,7 @@ app.post("/logout", function(req, res) {
   response(res, 200, "logout success!");
 });
 
-var port = process.env.PORT || 3000; // process.env.PORT for Heroku
+var port = process.env.PORT || 80; // process.env.PORT for Heroku
+console.log('Server started: http://localhost:'+port);
 app.listen(port);
 
-console.log('Server started: http://localhost:'+port);
