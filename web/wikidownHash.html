@@ -74,7 +74,7 @@
 
   <div id="panelShow" class="tab-pane panel"> <!-- 預覽 -->
     <div id="htmlBox" class="container"></div>
-	<div class="fb-share-button" data-href="https://developers.facebook.com/docs/plugins/" data-layout="button_count"></div>
+	<div id="fbShareButton" class="fb-share-button" data-href="https://developers.facebook.com/docs/plugins/" data-layout="button_count"></div>
   </div>
   <div id="panelEdit" class="tab-pane panel"> <!-- 編輯 -->
     <br/>
@@ -309,6 +309,9 @@ function loadFile(filepath) {
     $('#wdBox').val(wdNewFile);
     show();
   });
+<!-- <div id="fbShareButton" class="fb-share-button" data-href="https://developers.facebook.com/docs/plugins/" data-layout="button_count"></div>
+-->	
+  $('#fbShareButton').attr('data-href', '../db/'+path().domain+'/'+path().file+'.html');
 //  window.history.pushState(state, $('title').innerText, '/db/'+domain+'/'+file+'.html');
 }
 
