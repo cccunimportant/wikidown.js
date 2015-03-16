@@ -35,10 +35,19 @@
         </ul>
         <ul class="nav navbar-nav navbar-right">
           <li class="dropdown">
-            <a class="dropdown-toggle" data-toggle="dropdown" id="modeMenu">登入</a>
+            <a class="dropdown-toggle" data-toggle="dropdown">登入</a>
             <ul class="dropdown-menu" role="menu">
               <li><a onclick="login()">登入</a></li>
               <li><a onclick="logout()">登出</a></li>
+            </ul>
+          </li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+          <li class="dropdown">
+            <a class="dropdown-toggle" data-toggle="dropdown">分享</a>
+            <ul class="dropdown-menu" role="menu">
+              <li><a onclick="facebookShare()">Facebook</a></li>
+              <li><a onclick="staticShare()">靜態連結</a></li>
             </ul>
           </li>
         </ul>
@@ -49,7 +58,7 @@
             <button class="btn btn-success" type="button" onclick="edit()">編輯</button>
             <button class="btn btn-success" type="button" onclick="save()">儲存</button>
             <button class="btn btn-success" type="button" onclick="upload()">上傳</button>
-            <button class="btn btn-success" type="button" onclick="share()">分享</button>
+<!--        <button class="btn btn-success" type="button" onclick="share()">分享</button>-->
           </div>
         </form>     
       </div>
@@ -256,8 +265,12 @@ function absolute(base, relative) {
     return stack.join("/");
 }
 
-function share() {
+function facebookShare() {
   window.open("https://www.facebook.com/sharer/sharer.php?u="+escape(absolute(window.location.href, '../db/'+domain+'/'+file+'.html'))+'&t='+document.title, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=300,width=600')
+}
+
+function staticShare() {
+  window.open('../db/'+domain+'/'+file+'.html', '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=300,width=600')
 }
 
 function show() {
