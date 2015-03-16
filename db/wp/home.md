@@ -33,11 +33,13 @@
 | 實務案例                               |   說明                                |
 |--------------------------------------|------------------------------------------|
 | [HTML5的 CSS 版面範例](html5css_sample.html)  |      |
+| [翻譯系統](mt.html)  |  簡易英翻中，逐字對譯    |
+| [一對一聊天](chat11.html)  |  命令列介面    |
 | [聊天室系統](chat.html)  |  使用  socket.io    |
+| [網頁下載](pageget.html)  |  下載一個網頁    |
 | [搶票系統](ticket.html)  |   使用  socket.io       |
 | [Wikidown 維基型網誌系統](wikidown.html)  | 單頁應用 Single Page Application (SPA)   |
 | [英文單字測驗系統](elearn.html)  |                                        |
-| [英漢逐字對譯系統](mt.html)  |                                        |
 | [帳號登入系統 -- 使用 passport](login.html)  |                                        |
 | [多語言網站切換系統](login.html)  |                                        |
 

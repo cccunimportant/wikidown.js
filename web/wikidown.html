@@ -208,7 +208,7 @@
     var templateNow = template[domain];
     if (templateNow===undefined)
       templateNow = template['wikidown'];
-  return templateNow.split('%wd%').join(wd); // 不能用 replace(reg, str), 因為 str 中可能有參數 ＄...$ 符號，所以改用 split + join
+  return templateNow.split('<=%wd%>').join(wd); // 不能用 replace(reg, str), 因為 str 中可能有參數 ＄...$ 符號，所以改用 split + join
 }
 
 function wdToHtml(wd) {

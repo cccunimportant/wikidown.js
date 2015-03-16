@@ -1,0 +1,63 @@
+<html><head><meta charset="utf-8"><link href="../static.css" rel="stylesheet"><title>陳鍾誠/教科書/Web程式設計/一對一聊天（命令列介面）</title></head><body><header><p><a href="../main/home.html">&lt;&lt;</a>  <a href="../ccc/home.html">陳鍾誠</a>  / <a href="../book/home.html">教科書</a>  / <a href="../wp/home.html">Web程式設計</a> </p></header><main><article><h1 id="">一對一聊天 （命令列介面）</h1>
+
+<h2 id="">執行畫面</h2>
+
+<p><img src="chat11.png" alt="" title="" /></p>
+
+<h2 id="server">server 端</h2>
+
+<p>檔案: ChatServer.js</p>
+
+<pre><code class="javascript">var net = require('net');
+var readline = require('readline').createInterface(process.stdin, process.stdout);
+
+var server = net.createServer();
+
+server.on('connection', function(sock) {
+  console.log(sock.remoteAddress +':'+ sock.remotePort+' 連進來了');
+
+  readline.setPrompt('');
+  readline.prompt();
+
+  readline.on('line', function(line) {
+    sock.write(line);
+    readline.prompt();
+  });
+
+  sock.on('data', function(data) {
+    console.log('收到:' + sock.remoteAddress + ': ' + data);
+  });
+});
+
+server.listen(5757);
+console.log('server 啟動');
+</code></pre>
+
+<h2 id="client">client 端</h2>
+
+<p>檔案: ChatClient.js</p>
+
+<pre><code class="javascript">var net = require('net');
+var readline = require('readline').createInterface(process.stdin, process.stdout);
+
+var client = new net.Socket();
+
+readline.on('line', function(line) {
+  client.write(line);
+  readline.prompt();
+});
+
+client.connect(5757, '127.0.0.1', function() {
+  console.log('連接 ' + client.remoteAddress + ':' + client.remotePort);
+  readline.setPrompt('');
+  readline.prompt();
+});
+
+client.on('data', function(data) {
+    console.log('收到:' + data);
+});
+</code></pre>
+
+<hr />
+
+<p><center style="font-size:small;color:#888888">本文部份內容修改自 <a href="http://zh.wikipedia.org/">維基百科</a> ， 使用時請遵守 <a href="http://creativecommons.org/licenses/by-sa/3.0/tw/">姓名標示、相同方式分享</a> 授權。<br/> 雜誌編輯：  <a href="#ccc:home">陳鍾誠</a>  email: <a href="&#109;&#x61;&#x69;&#x6c;&#x74;o:&#x63;&#x63;&#99;&#x6b;&#109;&#105;&#x74;&#x40;&#103;&#109;&#97;&#x69;&#108;&#x2e;&#x63;&#111;&#109;">&#x63;&#x63;&#99;&#x6b;&#109;&#105;&#x74;&#x40;&#103;&#109;&#97;&#x69;&#108;&#x2e;&#x63;&#111;&#109;</a> </center></p></article></main></body></html>

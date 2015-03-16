@@ -49,6 +49,13 @@ function bookTemplate(domain) {
   return templateHead;
 }
 
+function bookTitle(domain) {
+  var titleHead = title['wikidown'];
+  if (title[domain] !== undefined)
+    titleHead = title[domain];
+  return titleHead;
+}
+/*
 function bookTitleHtml(domain) {
   var titleHead = title['wikidown'];
   if (title[domain] !== undefined)
@@ -56,7 +63,7 @@ function bookTitleHtml(domain) {
   c.log(titleHead);
   return wd2html(' [[<<]](main:home) '+titleHead, domain);
 }
-
+*/
 function processWd(wdFile, wdPath, template) {
   wdPath = wdPath.replace('\\', '/');
   var domain = wdPath.match(/\/([^\/]+)$/)[1];
@@ -66,23 +73,27 @@ function processWd(wdFile, wdPath, template) {
   var htmFile = wdFile.replace(/\.wd$/, '.html');
   c.log('file='+wdFile+' path='+wdPath+' domain='+domain+' mdFile='+mdFile+' htmFile='+htmFile);
   writeFile(wdPath+'/'+mdFile, md);
-  var md1 = replace(bookTemplate(domain), '%wd%', md);
+  var md1 = replace(bookTemplate(domain), '<%=wd%>', md);
 //  var wdHtml = converter.makeHtml(md1); // showdown.js
   var wdHtml = md2html(md1);
-  var html = replace(template, '?wdHtml?', wdHtml);
-  html = replace(html, '?bookTitle?', bookTitleHtml(domain));
+  var html = replace(template, '<%=wdHtml%>', wdHtml);
+  var titleMd = bookTitle(domain);
+  c.log('titleMd='+titleMd);
+  var titleHtml = wd2html(' [[<<]](main:home) '+titleMd, domain);
+  html = replace(html, '<%=bookTitle%>', titleHtml);
   var titleMatch = wd.match(/([^#\n]{1,100})/);
-  c.log('titleMatch='+titleMatch);
-  var pageTitle = '';
-  if (titleMatch !== null) pageTitle = titleMatch[1];
+//  c.log('titleMatch='+titleMatch);
+  var pageTitle = titleMd;
+  if (titleMatch !== null) pageTitle += ' / '+titleMatch[1];
+  pageTitle = pageTitle.replace(/(\s)\[\[([^\]]+?)\]\]\(([^:\)]+):([^:\)]+)\)/gi,'$2').replace(/[\s]/gi, '');
   c.log('pageTitle='+pageTitle);
-  html = replace(html, '?pageTitle?', pageTitle);
+  html = replace(html, '<%=pageTitle%>', pageTitle);
   writeFile(wdPath+'/'+htmFile, html);
 }
 
 // c.log(config);
 
-var template = '<html><head><meta charset="utf-8"><link href="../static.css" rel="stylesheet"><title>?pageTitle?</title></head><body><header>?bookTitle?</header><main><article>?wdHtml?</article></main></body></html>';
+var template = '<html><head><meta charset="utf-8"><link href="../static.css" rel="stylesheet"><title><%=pageTitle%></title></head><body><header><%=bookTitle%></header><main><article><%=wdHtml%></article></main></body></html>';
 
 var dir;
 
