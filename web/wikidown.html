@@ -49,6 +49,7 @@
             <button class="btn btn-success" type="button" onclick="edit()">編輯</button>
             <button class="btn btn-success" type="button" onclick="save()">儲存</button>
             <button class="btn btn-success" type="button" onclick="upload()">上傳</button>
+            <button class="btn btn-success" type="button" onclick="share()">分享</button>
           </div>
         </form>     
       </div>
@@ -85,13 +86,8 @@
   <script>
   $('.panel').css( "display", "none");
 
-  var filepath, converter;
+  var domain, file, converter; // filepath, 
   var wdNewFile = '# 標題：文件不存在\n\n您可以編輯後存檔！\n## 語法\n* [[內部連結]](innerLink)\n* [外部連結](link)';
-
-  function path() {
-    var tokens = filepath.split(':');
-    return { domain:tokens[0], file:tokens[1] };
-  }
 
   function isLogin() {
 	if (sessionStorage.login !== "true") {
@@ -167,7 +163,9 @@
 
   window.onhashchange = function () {
     filepath = window.location.hash.substring(1);
-    loadFile(filepath);
+	var parts  = filepath.split(':');
+	domain = parts[0], file=parts[1];
+    loadFile(domain, file);
     show();
   }
 
@@ -198,7 +196,7 @@
   }
 
   function templateApply(wd) {
-    var templateNow = template[path().domain];
+    var templateNow = template[domain];
     if (templateNow===undefined)
       templateNow = template['wikidown'];
   return templateNow.split('%wd%').join(wd); // 不能用 replace(reg, str), 因為 str 中可能有參數 ＄...$ 符號，所以改用 split + join
@@ -206,12 +204,12 @@
 
 function wdToHtml(wd) {
   wd  = '\n'+wd+' ';
-  wd  = wd.replace(/(\s)@\[\[([^\]]*?)\]\]\((.*?)\)/gi, '$1<a href="../db/'+path().domain+'/$3" class="innerLink">$2</a>'); // 內部檔案 [[text]](pathToFile)
-  wd  = wd.replace(/(\s)\!\[\[([^\]]*?)\]\]\((.*?)\)/gi, '$1<div class="figure"><img src="../db/'+path().domain+'/$3"/><p class="caption">$2</p></div>'); // 內部圖片 ![[text]](file)
+  wd  = wd.replace(/(\s)@\[\[([^\]]*?)\]\]\((.*?)\)/gi, '$1<a href="../db/'+domain+'/$3" class="innerLink">$2</a>'); // 內部檔案 [[text]](pathToFile)
+  wd  = wd.replace(/(\s)\!\[\[([^\]]*?)\]\]\((.*?)\)/gi, '$1<div class="figure"><img src="../db/'+domain+'/$3"/><p class="caption">$2</p></div>'); // 內部圖片 ![[text]](file)
   wd  = wd.replace(/(\s)\[\[([^\]]+?)\]\]\(([^:\)]+):([^:\)]+)\)/gi, '$1<a href="#$3:$4" class="innerLink">$2</a>'); // 內部連結 [[text]](domain:file)
-  wd  = wd.replace(/(\s)\[\[([^\]]+?)\]\]\((.*?)\)/gi, '$1<a href="#'+path().domain+':$3" class="innerLink">$2</a>'); // 內部連結 [[text]](file)
+  wd  = wd.replace(/(\s)\[\[([^\]]+?)\]\]\((.*?)\)/gi, '$1<a href="#'+domain+':$3" class="innerLink">$2</a>'); // 內部連結 [[text]](file)
   wd  = wd.replace(/(\s)\[\[([^\]:]+):([^\]:]+)\]\]/gi, '$1<a href="#$2:$3" class="innerLink">$2:$3</a>'); // 內部連結 [[domain:file]]
-  wd  = wd.replace(/(\s)\[\[([^\]:]+?)\]\]/gi, '$1<a href="#'+path().domain+':$2" class="innerLink">$2</a>'); // 內部連結 [[file]]
+  wd  = wd.replace(/(\s)\[\[([^\]:]+?)\]\]/gi, '$1<a href="#'+domain+':$2" class="innerLink">$2</a>'); // 內部連結 [[file]]
   wd  = wd.replace(/(\s)\$([^$\n]+?)\$/gi, '$1<script type="math/tex">$2</'+'script>');// 數學式 $$[latex]$$,  刻意把 '</'+'script>' 分開，避免瀏覽器認為是真的 script 區塊
   return md2html(wd);
 }
@@ -231,16 +229,20 @@ function edit() {
 function upload() {
   if (!isLogin()) return;
   switchPanel('panelUpload');
-//  alert('/upload/'+path().domain);
   $("#imageUpload").fileinput({
-    uploadUrl: "/upload/"+path().domain,
+    uploadUrl: "/upload/"+domain,
     maxFileCount: 10,
     uploadAsync: false,
     uploadExtraData: {
-        domain: path().domain,
-        file: path().file
+        domain: domain,
+        file: file
     }
   });
+}
+
+function share() {
+  window.open('../db/'+domain+'/'+file+'.html', '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=300,width=600');
+//  alert('分享網址：domain='+domain+' file='+file);
 }
 
 function show() {
@@ -272,16 +274,9 @@ function showTitle() {
     $('title').html($('#titleHead').text()+' -- '+$('h2')[0].innerText);
 }
 
-var state = { title:'', url:'' };
-
-function loadFile(filepath) {
-  if (filepath === null || filepath === '')
-    return;
-  $('#filepath').val(filepath);
-  showTitleHead(path().domain);
-
-  var domain=path().domain, file = path().file;
-  window.location.hash = '#'+filepath;
+function loadFile(domain, file) {
+  showTitleHead(domain);
+  window.location.hash = '#'+domain+':'+file;
   Server.load(domain, file)
   .done(function(wd) {
     $('#wdBox').val(wd);
@@ -291,13 +286,12 @@ function loadFile(filepath) {
     $('#wdBox').val(wdNewFile);
     show();
   });
-//  window.history.pushState(state, $('title').innerText, '/db/'+domain+'/'+file+'.html');
 }
 
 function save() {
   if (!isLogin()) return;
   var wd = $('#wdBox').val();
-  Server.save(path().domain, path().file, wd);
+  Server.save(domain, file, wd);
 }
 /*
 // 以下這種作法是為了加快速度，避免一開始載入 MathJax 花太久時間 ...

@@ -1,6 +1,9 @@
 <html>
 <head>
   <meta charset="utf-8" />
+  <meta property="og:site_name" content="wikidown" />
+  <meta property="og:title" content="關於 wikidown" />
+  <meta property="og:type" content="article" />
   <link href="favicon.ico" rel="icon">
   <link href="css/bootstrap.min.css" rel="stylesheet">
   <link href="css/highlight.default.min.css" rel="stylesheet">
@@ -9,23 +12,6 @@
   <title>Wikidown</title>
 </head>
 <body onload="init()">
- <script>
-      window.fbAsyncInit = function() {
-        FB.init({
-          appId      : 'wikidown.js',
-          xfbml      : true,
-          version    : 'v2.1'
-        });
-      };
-
-      (function(d, s, id){
-         var js, fjs = d.getElementsByTagName(s)[0];
-         if (d.getElementById(id)) {return;}
-         js = d.createElement(s); js.id = id;
-         js.src = "//connect.facebook.net/en_US/sdk.js";
-         fjs.parentNode.insertBefore(js, fjs);
-       }(document, 'script', 'facebook-jssdk'));
-    </script>
   <nav class="navbar navbar-inverse navbar-fixed-top">
     <div class="container">
       <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
@@ -74,7 +60,16 @@
 
   <div id="panelShow" class="tab-pane panel"> <!-- 預覽 -->
     <div id="htmlBox" class="container"></div>
-	<div id="fbShareButton" class="fb-share-button" data-href="https://developers.facebook.com/docs/plugins/" data-layout="button_count"></div>
+<!--	
+    <footer class="text-center">
+      <button class="btn btn-info" type="button" data-toggle="collapse" data-target="#footersharediv" aria-expanded="false" aria-controls="collapseExample">
+        <span class="glyphicon glyphicon-link" aria-hidden="true"></span>
+      </button>
+      <div class="row">
+        <div id="footersharediv" class="collapse col-md-offset-3 col-md-6 bg-info"></div>
+      </div>
+    </footer>
+-->	
   </div>
   <div id="panelEdit" class="tab-pane panel"> <!-- 編輯 -->
     <br/>
@@ -103,14 +98,14 @@
   <script>
   $('.panel').css( "display", "none");
 
-  var filepath, converter;
+  var converter, domain, file;
   var wdNewFile = '# 標題：文件不存在\n\n您可以編輯後存檔！\n## 語法\n* [[內部連結]](innerLink)\n* [外部連結](link)';
-
+/*
   function path() {
     var tokens = filepath.split(':');
     return { domain:tokens[0], file:tokens[1] };
   }
-
+*/
   function isLogin() {
 	if (sessionStorage.login !== "true") {
 		alert('未登入無法存檔上傳，請先登入!');
@@ -140,7 +135,7 @@
   Server.load=function(domain, file) {
     return $.ajax({
       type: "GET",
-      url: "../db/"+domain+"/"+file+".wd",
+      url: "/db/"+domain+"/"+file+".wd",
       timeout:2000,
       data: {}
     });
@@ -182,25 +177,59 @@
       alert( "登出失敗！" );
     });
   }
-
+/*
   window.onhashchange = function () {
     filepath = window.location.hash.substring(1);
     loadFile(filepath);
     show();
   }
-
+*/
   window.onbeforeunload = function(){}
 
   function md2html(md) {
 	return converter.makeHtml(md);
   }
+
+  function gotoPath(pDomain, pFile) {
+	domain = pDomain; file = pFile;
+    var state = { domain:domain, file:file, title:'', url:'' };
+    window.history.pushState(state, 'wikidown', '/db/'+domain+'/'+file+'.html');
+    loadFile(domain, file);
+    show();
+  }
+
+  window.addEventListener('popstate', function(e){
+    if (history.state){
+      var url = e.state.url;
+	  var domain = e.state.domain;
+	  var file = e.state.file;
+	  loadFile(domain, file);
+	  show();
+      //do something(state.url, state.title);
+    }
+  }, false);
+  
+  window.onbeforeunload = function () {
+    var state = { domain:domain, file:file, title:'', url:'' };
+    window.history.pushState(state, 'wikidown', '/web/wikidown.html#'+domain+':'+file);
+    return "本程式為單頁應用，請勿按重新整理！";
+  }; 
+  
+/*  
+  $(window).on('unload', function(e){
+    e.preventDefault();
+    alert('unload');
+  });  
+*/
   
   function init() {
     converter = new Showdown.converter({ extensions: ['table'] });
+	gotoPath('main', 'home');
+//	pathUpdate('main', 'home');
+/*
     if (window.location.hash === '')
       window.location.hash = '#main:home';
     window.onhashchange();
-
     $('#filepath').keypress(function(e) {
       if (e.which == '13') {
        e.preventDefault();
@@ -208,6 +237,7 @@
        loadFile(filepath);
      }
    });
+*/
   }
 
   function switchPanel(name) {
@@ -216,7 +246,7 @@
   }
 
   function templateApply(wd) {
-    var templateNow = template[path().domain];
+    var templateNow = template[domain];
     if (templateNow===undefined)
       templateNow = template['wikidown'];
   return templateNow.split('%wd%').join(wd); // 不能用 replace(reg, str), 因為 str 中可能有參數 ＄...$ 符號，所以改用 split + join
@@ -224,12 +254,12 @@
 
 function wdToHtml(wd) {
   wd  = '\n'+wd+' ';
-  wd  = wd.replace(/(\s)@\[\[([^\]]*?)\]\]\((.*?)\)/gi, '$1<a href="../db/'+path().domain+'/$3" class="innerLink">$2</a>'); // 內部檔案 [[text]](pathToFile)
-  wd  = wd.replace(/(\s)\!\[\[([^\]]*?)\]\]\((.*?)\)/gi, '$1<div class="figure"><img src="../db/'+path().domain+'/$3"/><p class="caption">$2</p></div>'); // 內部圖片 ![[text]](file)
-  wd  = wd.replace(/(\s)\[\[([^\]]+?)\]\]\(([^:\)]+):([^:\)]+)\)/gi, '$1<a href="#$3:$4" class="innerLink">$2</a>'); // 內部連結 [[text]](domain:file)
-  wd  = wd.replace(/(\s)\[\[([^\]]+?)\]\]\((.*?)\)/gi, '$1<a href="#'+path().domain+':$3" class="innerLink">$2</a>'); // 內部連結 [[text]](file)
-  wd  = wd.replace(/(\s)\[\[([^\]:]+):([^\]:]+)\]\]/gi, '$1<a href="#$2:$3" class="innerLink">$2:$3</a>'); // 內部連結 [[domain:file]]
-  wd  = wd.replace(/(\s)\[\[([^\]:]+?)\]\]/gi, '$1<a href="#'+path().domain+':$2" class="innerLink">$2</a>'); // 內部連結 [[file]]
+  wd  = wd.replace(/(\s)@\[\[([^\]]*?)\]\]\((.*?)\)/gi, '$1<a href="/db/'+domain+'/$3" class="innerLink">$2</a>'); // 內部檔案 [[text]](pathToFile)
+  wd  = wd.replace(/(\s)\!\[\[([^\]]*?)\]\]\((.*?)\)/gi, '$1<div class="figure"><img src="/db/'+domain+'/$3"/><p class="caption">$2</p></div>'); // 內部圖片 ![[text]](file)
+  wd  = wd.replace(/(\s)\[\[([^\]]+?)\]\]\(([^:\)]+):([^:\)]+)\)/gi, '$1<a class="innerLink" onclick="gotoPath(\'$3\', \'$4\')">$2</a>'); // 內部連結 [[text]](domain:file)
+  wd  = wd.replace(/(\s)\[\[([^\]]+?)\]\]\((.*?)\)/gi, '$1<a class="innerLink" onclick="gotoPath(\''+domain+'\',\'$3\')">$2</a>'); // 內部連結 [[text]](file)
+  wd  = wd.replace(/(\s)\[\[([^\]:]+):([^\]:]+)\]\]/gi, '$1<a class="innerLink" onclick="gotoPath(\'$2\', \'$3\')">$2:$3</a>'); // 內部連結 [[domain:file]]
+  wd  = wd.replace(/(\s)\[\[([^\]:]+?)\]\]/gi, '$1<a class="innerLink" onclick="gotoPath(\''+domain+'\',\'$2\')">$2</a>'); // 內部連結 [[file]]
   wd  = wd.replace(/(\s)\$([^$\n]+?)\$/gi, '$1<script type="math/tex">$2</'+'script>');// 數學式 $$[latex]$$,  刻意把 '</'+'script>' 分開，避免瀏覽器認為是真的 script 區塊
   return md2html(wd);
 }
@@ -251,13 +281,15 @@ function upload() {
   switchPanel('panelUpload');
 //  alert('/upload/'+path().domain);
   $("#imageUpload").fileinput({
-    uploadUrl: "/upload/"+path().domain,
+    uploadUrl: "/upload/"+domain,
     maxFileCount: 10,
     uploadAsync: false,
+/*	
     uploadExtraData: {
-        domain: path().domain,
-        file: path().file
+        domain: domain,
+        file: file
     }
+*/	
   });
 }
 
@@ -290,16 +322,9 @@ function showTitle() {
     $('title').html($('#titleHead').text()+' -- '+$('h2')[0].innerText);
 }
 
-var state = { title:'', url:'' };
-
-function loadFile(filepath) {
-  if (filepath === null || filepath === '')
-    return;
-  $('#filepath').val(filepath);
-  showTitleHead(path().domain);
-
-  var domain=path().domain, file = path().file;
-  window.location.hash = '#'+filepath;
+function loadFile(domain, file) {
+  showTitleHead(domain);
+//  window.location.hash = '#'+filepath;
   Server.load(domain, file)
   .done(function(wd) {
     $('#wdBox').val(wd);
@@ -309,16 +334,13 @@ function loadFile(filepath) {
     $('#wdBox').val(wdNewFile);
     show();
   });
-<!-- <div id="fbShareButton" class="fb-share-button" data-href="https://developers.facebook.com/docs/plugins/" data-layout="button_count"></div>
--->	
-  $('#fbShareButton').attr('data-href', '../db/'+path().domain+'/'+path().file+'.html');
 //  window.history.pushState(state, $('title').innerText, '/db/'+domain+'/'+file+'.html');
 }
 
 function save() {
   if (!isLogin()) return;
   var wd = $('#wdBox').val();
-  Server.save(path().domain, path().file, wd);
+  Server.save(domain, file, wd);
 }
 /*
 // 以下這種作法是為了加快速度，避免一開始載入 MathJax 花太久時間 ...
@@ -327,6 +349,17 @@ $( document ).ready(function() {
     $('body').append('<'+'script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_SVG"></'+'script>');
 });
 */
+/*
+  function sharebutton() {
+    var c = 'web';
+    var currenpath = window.location;
+    $("#footersharediv").text('' +
+      currenpath.origin + currenpath.pathname + '/db/' + domain +'/link/' + file + '.html');
+  }
+  $(window).load(function() {
+    sharebutton();
+  });	
+*/  
 </script>
 
 <script src="js/Showdown/Showdown.min.js"></script>
