@@ -1,9 +1,12 @@
+var config = (function() {
+	
 var titleCcc  = ' [[陳鍾誠]](ccc:home) ';
 var titleBook  = ' / [[教科書]](book:home) ';
 var titlePmag = ' [[程式人雜誌]](pmag:home) ';
 var titleYmag = ' [[少年科技人雜誌]](ymag:home) ';
 
 var title={
+	'default':' [[Wikidown]](wikidown:home) ',
 	ccc:titleCcc,
 	book:titleCcc+titleBook,
 	js:titleCcc+titleBook+' / [[JavaScript 語言基礎]](js:home) ',
@@ -22,8 +25,12 @@ var title={
 	st:titleCcc+titleBook+' / [[機率統計]](st:home) '
 };
 
-var templatePmag='<%=wd%>\n\n----\n\n\
-<center style="font-size:small;color:#888888">本文部份內容修改自 [維基百科] ， 使用時請遵守 [姓名標示、相同方式分享] 授權。<br/> 雜誌編輯：  [陳鍾誠](#ccc:home)  email: <ccckmit@gmail.com> </center>\n\
+var templateCopyright='<%=wd%>\n\n----\n\n\
+<center style="font-size:small;color:#888888">(C) 版權所有，可以轉貼網址，但禁止轉載內容<br/> 作者：  [陳鍾誠](#ccc:home)  email: <ccckmit@gmail.com> </center>\n\
+[陳鍾誠]: http://ccckmit.wikidot.com/\n';
+
+var templateCC='<%=wd%>\n\n----\n\n\
+<center style="font-size:small;color:#888888">本文部份內容修改自 [維基百科] ， 使用時請遵守 [姓名標示、相同方式分享] 授權。<br/> 編輯：  [陳鍾誠](#ccc:home)  email: <ccckmit@gmail.com></center>\n\
 [程式人雜誌社團]: https://www.facebook.com/groups/programmerMagazine/\n\
 [少年科技人社團]: https://www.facebook.com/groups/youngmaker.magazine/\n\
 [少年科技人雜誌]: http://programmermagazine.github.io/youngmaker/\n\
@@ -34,24 +41,28 @@ var templatePmag='<%=wd%>\n\n----\n\n\
 [維基百科]:http://zh.wikipedia.org/\n';
 
 var template={
-	wikidown:templatePmag,
-	pmag:templatePmag,
-	pmag201503:templatePmag,
-	ymag:templatePmag,
-	ymag201502:templatePmag,
-	ai:templatePmag,
-	blender:templatePmag,
-	co:templatePmag,
-	ss:templatePmag,
-	st:templatePmag,
-	ct:templatePmag,
-	ccc:templatePmag
+	'default':templateCC,
+	wikidown:templateCC,
+	pmag:templateCC,
+	pmag201503:templateCC,
+	ymag:templateCC,
+	ymag201502:templateCC,
+	ai:templateCC,
+	blender:templateCC,
+	co:templateCC,
+	ss:templateCC,
+	st:templateCC,
+	ct:templateCC,
+	js:templateCopyright,
+	ccc:templateCC
 };
 
-var config = {
+return {
   title: title,
   template: template
 }
+  
+})();
 
 if (typeof module !== 'undefined') 
   module.exports = config;

@@ -5,18 +5,11 @@
 | 第 1 章. [[Web 程式簡介]](introduction) | Web=HTTP+HTML+CSS+JavaScript+WebServer  |
 | 第 2 章. [[HTML 網頁設計]](html)   |  HTML ＝網頁的統一標準格式  |
 | 第 3 章. [[CSS 版面設計]](css)     |  為 HTML 提供統一的排版方式    |
-| 第 4 章. [[DHTML 動態網頁]](dhtml) |   將 JavaScript 嵌在網頁中操控網頁的動態呈現方式  |
-| 第 5 章. [[Node.js 命令列]](node)  | 讓 JavaScript 作為一般程式執行       |
-| 第 6 章. [[Node.js 的 Web 程式]](node_web)|   用 Node.js 撰寫 WebServer 端的伺服程式   |
-| 第 7 章. [[Node.js 表單]](node_form)  |   利用表單傳送使用者填寫的資料給伺服程式  |
-
-## JavaScript 的基礎函式庫
-
-| 主題                                  |   說明                                |
-|--------------------------------------|------------------------------------------|
-| [[JavaScript 程式設計]](javascript) |                                 |
-| [[JavaScript 的字串處理]](javascript_string) |                        |
-
+| 第 4 章. [[JavaScript 程式設計]](javascript) |  網頁內執行的語言   |
+| 第 5 章. [[DHTML 動態網頁]](dhtml) |   將 JavaScript 嵌在網頁中操控網頁的動態呈現方式  |
+| 第 6 章. [[Node.js 命令列]](node)  | 讓 JavaScript 作為一般程式執行       |
+| 第 7 章. [[Node.js 的 Web 程式]](node_web)|   用 Node.js 撰寫 WebServer 端的伺服程式   |
+| 第 8 章. [[Node.js 表單]](node_form)  |   利用表單傳送使用者填寫的資料給伺服程式  |
 
 ## 套件用法
 
@@ -24,7 +17,6 @@
 |--------------------------------------|------------------------------------------|
 | [[express]]  |  路由處理      |
 | [[ejs]]  |   樣板引擎   |
-| [[socket.io]]  | websocket 的封裝，雙向通訊    |
 | [[mongoose]]  |  mongoDB 的封裝，單資料庫   |
 | [[heroku]]  | 發佈網站到 heroku 雲端主機上 |
 

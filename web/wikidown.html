@@ -5,7 +5,7 @@
   <link href="css/bootstrap.min.css" rel="stylesheet">
   <link href="css/highlight.default.min.css" rel="stylesheet">
   <link href="css/fileinput.css" media="all" rel="stylesheet"/>
-  <link href="main.css" rel="stylesheet">
+  <link href="wikidown.css" rel="stylesheet">
   <title>Wikidown</title>
 </head>
 <body onload="init()">
@@ -66,7 +66,7 @@
   </nav>
 
   <div id="panelShow" class="tab-pane panel"> <!-- 預覽 -->
-    <div id="htmlBox" class="container"></div>
+    <div id="htmlBox" style="overflow-y: scroll;height:90%"></div>
   </div>
   <div id="panelEdit" class="tab-pane panel"> <!-- 編輯 -->
     <br/>
@@ -92,126 +92,126 @@
   </div>
   <script src="js/jquery.min.js"></script>
   <script src="js/bootstrap.min.js"></script>
-  <script>
-  $('.panel').css( "display", "none");
+<script>
+$('.panel').css( "display", "none");
 
-  var domain, file, converter; // filepath, 
-  var wdNewFile = '# 標題：文件不存在\n\n您可以編輯後存檔！\n## 語法\n* [[內部連結]](innerLink)\n* [外部連結](link)';
+var domain, file, converter; // filepath, 
+var wdNewFile = '# 標題：文件不存在\n\n您可以編輯後存檔！\n## 語法\n* [[內部連結]](innerLink)\n* [外部連結](link)';
 
-  function isLogin() {
-	if (sessionStorage.login !== "true") {
-		alert('未登入無法存檔上傳，請先登入!');
-		login();
-		return false;
-	}
-	return true;
-  }
-
-  Server = {};
-
-  Server.save=function(domain, file, doc) {
-    $.ajax({
-      type: "POST",
-      url: "/db/"+domain+"/"+file+".wd",
-      timeout:2000,
-      data: { obj: doc },
-    })
-    .done(function(data) {
-      alert( "存檔完成!");
-    })
-    .fail(function() {
-      alert( "存檔失敗！" );
-    });
-  }
-
-  Server.load=function(domain, file) {
-    return $.ajax({
-      type: "GET",
-      url: "../db/"+domain+"/"+file+".wd",
-      timeout:2000,
-      data: {}
-    });
-  }
-
-  Server.login=function() {
-    $.ajax({
-      type: "POST",
-      url: "/login",
-      timeout:2000,
-      data: { user:$('#loginUser').val(), password:$('#loginPassword').val() },
-    })
-    .done(function(data) {
-	  sessionStorage.login = "true";
-      alert( "登入成功!");
-      $('#loginPassword').val('');
-      edit();
-    })
-    .fail(function() {
-	  sessionStorage.login = "false";
-      alert( "登入失敗！" );
-      login();
-    });
-  }
-
-  Server.logout=function() {
-    $.ajax({
-      type: "POST",
-      url: "/logout",
-      timeout:2000,
-      data: {},
-    })
-    .done(function(data) {
-	  sessionStorage.login = "false";
-      alert( "登出成功!");
-      show();
-    })
-    .fail(function() {
-      alert( "登出失敗！" );
-    });
-  }
-
-  window.onhashchange = function () {
-    filepath = window.location.hash.substring(1);
-	var parts  = filepath.split(':');
-	domain = parts[0], file=parts[1];
-    loadFile(domain, file);
-    show();
-  }
-
-  window.onbeforeunload = function(){}
-
-  function md2html(md) {
-	return converter.makeHtml(md);
-  }
-  
-  function init() {
-    converter = new Showdown.converter({ extensions: ['table'] });
-    if (window.location.hash === '')
-      window.location.hash = '#main:home';
-    window.onhashchange();
-
-    $('#filepath').keypress(function(e) {
-      if (e.which == '13') {
-       e.preventDefault();
-       filepath = $('#filepath').val();
-       loadFile(filepath);
-     }
-   });
-  }
-
-  function switchPanel(name) {
-    $('.panel').css( "display", "none");
-    $('#'+name).css( "display", "block");
-  }
-
-  function templateApply(wd) {
-    var templateNow = template[domain];
-    if (templateNow===undefined)
-      templateNow = template['wikidown'];
-  return templateNow.split('<%=wd%>').join(wd); // 不能用 replace(reg, str), 因為 str 中可能有參數 ＄...$ 符號，所以改用 split + join
+function isLogin() {
+if (sessionStorage.login !== "true") {
+	alert('未登入無法存檔上傳，請先登入!');
+	login();
+	return false;
+}
+return true;
 }
 
-function wdToHtml(wd) {
+Server = {};
+
+Server.save=function(domain, file, doc) {
+	$.ajax({
+		type: "POST",
+		url: "/db/"+domain+"/"+file+".wd",
+		timeout:2000,
+		data: { obj: doc },
+	})
+	.done(function(data) {
+		alert( "存檔完成!");
+	})
+	.fail(function() {
+		alert( "存檔失敗！" );
+	});
+}
+
+Server.load=function(domain, file) {
+	return $.ajax({
+		type: "GET",
+		url: "../db/"+domain+"/"+file+".wd",
+		timeout:2000,
+		data: {}
+	});
+}
+
+Server.login=function() {
+	$.ajax({
+		type: "POST",
+		url: "/login",
+		timeout:2000,
+		data: { user:$('#loginUser').val(), password:$('#loginPassword').val() },
+	})
+	.done(function(data) {
+	sessionStorage.login = "true";
+		alert( "登入成功!");
+		$('#loginPassword').val('');
+		edit();
+	})
+	.fail(function() {
+	sessionStorage.login = "false";
+		alert( "登入失敗！" );
+		login();
+	});
+}
+
+Server.logout=function() {
+	$.ajax({
+		type: "POST",
+		url: "/logout",
+		timeout:2000,
+		data: {},
+	})
+	.done(function(data) {
+	sessionStorage.login = "false";
+		alert( "登出成功!");
+		show();
+	})
+	.fail(function() {
+		alert( "登出失敗！" );
+	});
+}
+
+window.onhashchange = function () {
+	filepath = window.location.hash.substring(1);
+	var parts  = filepath.split(':');
+	domain = parts[0], file=parts[1];
+	loadFile(domain, file);
+	show();
+}
+
+window.onbeforeunload = function(){}
+
+function md2html(md) {
+	return converter.makeHtml(md);
+}
+
+function init() {
+	converter = new Showdown.converter({ extensions: ['table'] });
+	if (window.location.hash === '')
+		window.location.hash = '#main:home';
+	window.onhashchange();
+
+	$('#filepath').keypress(function(e) {
+		if (e.which == '13') {
+		 e.preventDefault();
+		 filepath = $('#filepath').val();
+		 loadFile(filepath);
+	 }
+ });
+}
+
+function switchPanel(name) {
+	$('.panel').css( "display", "none");
+	$('#'+name).css( "display", "block");
+}
+
+function templateApply(wd) {
+	var templateNow = config.template[domain];
+	if (templateNow===undefined)
+		templateNow = config.template['wikidown'];
+	return templateNow.split('<%=wd%>').join(wd); // 不能用 replace(reg, str), 因為 str 中可能有參數 ＄...$ 符號，所以改用 split + join
+}
+
+function wdToHtml(wd, domain) {
   wd  = '\n'+wd+' ';
   wd  = wd.replace(/(\s)@\[\[([^\]]*?)\]\]\((.*?)\)/gi, '$1<a href="../db/'+domain+'/$3" class="innerLink">$2</a>'); // 內部檔案 [[text]](pathToFile)
   wd  = wd.replace(/(\s)\!\[\[([^\]]*?)\]\]\((.*?)\)/gi, '$1<div class="figure"><img src="../db/'+domain+'/$3"/><p class="caption">$2</p></div>'); // 內部圖片 ![[text]](file)
@@ -276,7 +276,7 @@ function staticShare() {
 function show() {
   var wd = $('#wdBox').val();
   wd  = templateApply(wd);
-  var html = wdToHtml(wd);
+  var html = wdToHtml(wd, domain);
   $('#htmlBox').html(html);
   $('pre code').each(function(i, block) {
     hljs.highlightBlock(block);
@@ -288,10 +288,10 @@ function show() {
 }
 
 function showTitleHead(domain) {
-  var titleHead = title['wikidown'];
-  if (title[domain] !== undefined)
-    titleHead = title[domain];
-  var titleHtml = wdToHtml(titleHead);
+  var titleHead = config.title['wikidown'];
+  if (config.title[domain] !== undefined)
+    titleHead = config.title[domain];
+  var titleHtml = wdToHtml(titleHead, domain);
   $('#titleHead').html(titleHtml);
 }
 

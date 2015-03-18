@@ -37,8 +37,8 @@ app.use(multer({
     return true;
   },
   rename: function (fieldname, filename, req, res) {
-  domain = req.url.match(/\/([^\/]+)$/)[1];
-    return domain+'/'+filename.replace(/\W+/g, '-').toLowerCase();
+    domain = req.url.match(/\/([^\/]+)$/)[1];
+    return domain+'/'+filename; // .replace(/\W+/g, '-').toLowerCase();
   },
   onParseEnd: function (req, next) {
     next();
@@ -105,6 +105,6 @@ app.post("/logout", function(req, res) {
 });
 
 var port = process.env.PORT || 80; // process.env.PORT for Heroku
-console.log('Server started: http://localhost:'+port);
 app.listen(port);
+console.log('Server started: http://localhost:'+port);
 

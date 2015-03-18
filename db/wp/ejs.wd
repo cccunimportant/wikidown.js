@@ -1,8 +1,10 @@
 # javascript 套件的用法 -- ejs 樣板引擎
 
+專案下載： @[[ejs.zip]](code/ejs.zip)
+
 ## 程式
 
-檔案：ejstest
+檔案：ejstest.js
 
 ```javascript
 var fs = require('fs');

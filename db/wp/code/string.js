@@ -1,0 +1,24 @@
+var s = "Hello";
+
+console.log("s = "+s);
+console.log("s.constructor = "+s.constructor);
+console.log("s.length = "+s.length);
+console.log("s.prototype = "+s.prototype);
+console.log("s.charAt(1) = "+s.charAt(1));
+console.log("s.charCodeAt(1) = "+s.charCodeAt(1));
+console.log("s.concat(' World', ' !') = "+s.concat(' World', ' !'));
+console.log("String.fromCharCode(72,69,76,76,79) = "+String.fromCharCode(72,69,76,76,79));
+console.log("s.indexOf('el') = "+s.indexOf('el'));
+console.log("s.lastIndexOf('l') = "+s.lastIndexOf('l'));
+console.log("s.match('[aeiou]') = "+s.match('[aeiou]'));
+console.log("s.replace('l', 'L') = "+s.replace('l', 'L'));
+console.log("s.search('[aeiou]') = "+s.search('[aeiou]'));
+console.log("s.slice(2,4) = "+s.slice(2,4));
+console.log("s.slice(2) = "+s.slice(2));
+console.log("s.slice(-3) = "+s.slice(-3));
+console.log("s.split('e') = "+s.split('e'));
+console.log("s.substr(2,2) = "+s.substr(2,2));
+console.log("s.substring(2,4) = "+s.substr(2,4));
+console.log("s.toLowerCase() = "+s.toLowerCase());
+console.log("s.toUpperCase() = "+s.toUpperCase());
+console.log("s.valueOf() = "+s.valueOf());

@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+</head>
+  <body> 
+    <form method="POST" action="/save/[[?path?]]">
+      <label>檔案路徑：[[?path?]]</label><br>
+      <textarea name="note" rows=30 cols=80>
+[[?fileText?]]      
+      </textarea><br/>
+      <input type="submit" value="送出"/>
+    </form>
+  </body>
+</html>

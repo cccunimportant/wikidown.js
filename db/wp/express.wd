@@ -2,7 +2,7 @@
 
 ## 用 node+express 呈現靜態網站
 
-專案下載：[staticServer.zip](../code/staticServer.zip)
+專案下載： @[[staticServer.zip]](code/staticServer.zip)
 
 檔案: staticServer.js
 
