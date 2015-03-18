@@ -1,0 +1,68 @@
+<html><head><meta charset="utf-8"><link href="../static.css" rel="stylesheet"><title>陳鍾誠/教科書/Web程式設計/在node.js中用mongoose連接mongoDB</title></head><body><header><p><a href="../main/home.html">&lt;&lt;</a>  <a href="../ccc/home.html">陳鍾誠</a>  / <a href="../book/home.html">教科書</a>  / <a href="../wp/home.html">Web程式設計</a> </p></header><main><article><h1 id="nodejsmongoosemongodb">在 node.js 中用 mongoose 連接 mongoDB</h1>
+
+<h2 id="mongodb">安裝 mongoDB</h2>
+
+<pre><code>brew install mongodb
+mkdir -p /data/db
+mongod
+</code></pre>
+
+<p>參考： <a href="http://docs.mongodb.org/manual/tutorial/install-mongodb-on-os-x/">http://docs.mongodb.org/manual/tutorial/install-mongodb-on-os-x/</a></p>
+
+<h2 id="">程式</h2>
+
+<p>檔案：mongooseTest</p>
+
+<pre><code class="javascript">var mongoose = require('mongoose');
+var log = console.log;
+log("connect");
+
+mongoose.connect('mongodb://localhost/test');
+
+var person = mongoose.model('person', { name: String, email:String });
+
+var p1 = new person({ name: 'ccc', email:"ccckmit@gmail.com" });
+
+p1.save(function (err) {
+  if (err) {}
+  console.log('saved');
+//  mongoose.connection.close()
+});
+
+
+person.find({ name: "ccc" }, function (err, docs) {
+            log("docs="+docs);
+  mongoose.connection.close()
+});
+
+/*
+person.find({ name:"ccc" }).remove(function(err, docs) {
+  log("docs="+docs);
+  mongoose.connection.close()
+});
+*/
+
+log("end");
+</code></pre>
+
+<h2 id="">執行結果</h2>
+
+<pre><code>nqu-192-168-61-142:code mac020$ node mongooseTest
+connect
+end
+docs=
+saved
+nqu-192-168-61-142:code mac020$ node mongooseTest
+connect
+end
+docs={ _id: 5508eb061d12dd616af9de33,
+  name: 'ccc',
+  email: 'ccckmit@gmail.com',
+  __v: 0 }
+saved
+nqu-192-168-61-142:code mac020$ 
+</code></pre>
+
+<hr />
+
+<p><center style="font-size:small;color:#888888">本文部份內容修改自 <a href="http://zh.wikipedia.org/">維基百科</a> ， 使用時請遵守 <a href="http://creativecommons.org/licenses/by-sa/3.0/tw/">姓名標示、相同方式分享</a> 授權。<br/> 編輯：  <a href="#ccc:home">陳鍾誠</a>  email: <a href="m&#x61;&#x69;&#108;&#116;&#111;:&#99;&#99;&#99;&#x6b;&#109;&#x69;&#x74;&#64;&#x67;&#109;&#x61;&#x69;&#x6c;&#46;&#x63;&#111;&#x6d;">&#99;&#99;&#99;&#x6b;&#109;&#x69;&#x74;&#64;&#x67;&#109;&#x61;&#x69;&#x6c;&#46;&#x63;&#111;&#x6d;</a></center></p></article></main></body></html>

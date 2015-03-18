@@ -1,7 +1,8 @@
+# 開放原始碼的世界
 
-| 出刊年月 |  wikidown | html | epub | pdf | 焦點主題 |
-|-------------|---------------|-------|-------|------|-------------|
-| [2015年2月號](db/ymag201502/book/index.html) |  [wikidown](../ymag201502/home.html) |  [html](db/ymag201502/book/book.html) |  [epub](db/ymag201502/book/book.epub) | [pdf](db/ymag201502/book/book.pdf) | 開放原始碼的世界  |
+| 出刊年月 |  html | epub | pdf |
+|-------------|-------|-------|-------------|
+| 2015年2月號 |  @[[html]](book.html) |  @[[epub]](book.epub) | @[[pdf]](book.pdf) | 
 
 * 前言
     * [編輯小語](editor.html)
