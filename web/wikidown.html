@@ -207,7 +207,7 @@ function switchPanel(name) {
 function templateApply(wd) {
 	var templateNow = config.template[domain];
 	if (templateNow===undefined)
-		templateNow = config.template['wikidown'];
+		templateNow = config.template['default'];
 	return templateNow.split('<%=wd%>').join(wd); // 不能用 replace(reg, str), 因為 str 中可能有參數 ＄...$ 符號，所以改用 split + join
 }
 
@@ -288,7 +288,7 @@ function show() {
 }
 
 function showTitleHead(domain) {
-  var titleHead = config.title['wikidown'];
+  var titleHead = config.title['default'];
   if (config.title[domain] !== undefined)
     titleHead = config.title[domain];
   var titleHtml = wdToHtml(titleHead, domain);

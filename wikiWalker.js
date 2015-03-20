@@ -1,6 +1,6 @@
-var walk     = require('walk');
-var wikidown = require('./wikidown');
-var c        = console;
+var walk  = require('walk');
+var wdlib = require('./wdlib');
+var c     = console;
 var dir;
 
 if (process.argv.length > 2) {
@@ -15,7 +15,7 @@ walker.on('file', function(dir, stat, next) {
   var file = stat.name;
   if (file.indexOf('.wd') >= 0 && file.indexOf('*') < 0) {
     c.log('file='+file+' dir='+dir);
-    wikidown.toHtmlFile(file, dir);
+    wdlib.toHtmlFile(file, dir);
   }
   next();
 });

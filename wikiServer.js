@@ -8,6 +8,8 @@ var cookieParser = require('cookie-parser')
 var session = require('express-session');
 var serveIndex = require('serve-index');
 var multer  = require('multer');
+var jslib   = require('./jslib');
+var wdlib   = require('./wdlib');
 var setting = require('./setting');
 var passwords = setting.passwords;
 
@@ -81,12 +83,19 @@ app.post("/db/:domain/:file", function(req, res) {
   var file   = req.params.file;
   var obj    = req.body.obj;
   c.log("domain="+domain+" file="+file);
+	// 寫入檔案 （通常是 *.wd 檔案）
   fs.writeFile(dbRoot+"/"+domain+"/"+file, obj, function(err) {
     if (err)
       response(res, 500, 'write fail!');
     else
       response(res, 200, 'write success!');
-  })
+  });
+	// 將 *.wd 轉為 *.html 後寫入
+	if (jslib.endsWith(file, '.wd')) {
+		var html = wdlib.toHtml(obj, domain);
+		var htmFile = file.replace(/\.wd$/, '.html');
+    fs.writeFile(dbRoot+"/"+domain+"/"+htmFile, html, function(err) {});			
+	}
 });
 
 app.post("/login", function(req, res) {

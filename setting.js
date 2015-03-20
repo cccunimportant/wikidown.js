@@ -3,6 +3,6 @@ var setting = {
 };
 
 setting.passwords = {
-	ccc:'wi371461'
+	ccc:'123'
 };
 module.exports = setting;

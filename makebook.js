@@ -13,10 +13,12 @@ for (var i in lines) {
   var head = tokens[0].trim();
   if (head === 'file') {
     var mdFile = tokens[1].trim()+'.md';
+    c.log('mdFile='+mdFile);
     var mdText = fs.readFileSync(path+'/'+mdFile, 'utf8');
     outText += mdText+'\n';
   } else {
     outText += lines[i]+'\n';
   }
 }
+c.log(outText);
 fs.writeFileSync(path+'/book.md', outText);
